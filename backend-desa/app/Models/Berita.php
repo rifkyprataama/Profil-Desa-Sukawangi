@@ -9,6 +9,10 @@ class Berita extends Model
 {
     use HasFactory;
 
-    // Mengizinkan semua kolom diisi data, kecuali kolom 'id'
-    protected $guarded = ['id']; 
+    protected $fillable = [
+        'judul',
+        'slug',      // <-- Pastikan slug ada di sini
+        'isi_berita',
+        'gambar',
+    ];
 }
