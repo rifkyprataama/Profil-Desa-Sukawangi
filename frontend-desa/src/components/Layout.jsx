@@ -1,43 +1,76 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import ScrollToTop from './ScrollToTop';
+import { Menu, MapPin, Mail } from 'lucide-react'; // Menggunakan ikon Lucide
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"; // Komponen Drawer Mobile
+import { Toaster } from "@/components/ui/sonner"; // Komponen Global Alert
 
 export default function Layout() {
   const location = useLocation();
 
-  // Fungsi kecil untuk mendeteksi menu mana yang sedang aktif
+  // Fungsi untuk mendeteksi menu mana yang sedang aktif
   const isActive = (path) => {
-    return location.pathname === path ? "border-b-2 border-white pb-1 font-semibold" : "hover:text-[#a5d0b9] transition";
+    return location.pathname === path 
+      ? "text-[#012d1d] font-bold border-b-2 border-[#012d1d] pb-1" 
+      : "text-[#414844] hover:text-[#012d1d] transition-colors py-1";
   };
 
   return (
-    // Menggunakan warna latar belakang Cream (#fbf9f5) dan teks default On-Surface (#1b1c1a)
-    <div className="min-h-screen flex flex-col bg-[#fbf9f5] text-[#1b1c1a] font-sans">
+    <div className="min-h-screen flex flex-col bg-[#fbf9f5] text-[#1b1c1a] font-['Inter']">
       
-      {/* NAVBAR: Menggunakan warna Primary Deep Nature Green (#012d1d) */}
-      <nav className="bg-[#012d1d] text-white shadow-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Pemicu agar layar selalu kembali ke atas saat pindah halaman */}
+      <ScrollToTop />
+      
+      {/* NAVBAR: Menggunakan warna Surface (Krem) dengan efek blur kaca */}
+      <nav className="sticky top-0 w-full z-50 bg-[#fbf9f5]/90 backdrop-blur-md border-b border-[#c1c8c2]/30 transition-all duration-200 ease-in-out">
+        <div className="max-w-[1200px] mx-auto px-6">
           <div className="flex justify-between h-20 items-center">
             
             {/* Logo / Nama Desa */}
-            <div className="text-2xl font-bold tracking-tight">
+            <div className="text-[24px] font-semibold text-[#012d1d] tracking-tight">
               <Link to="/">Desa Sukawangi</Link>
             </div>
             
-            {/* Menu Navigasi */}
-            <div className="hidden md:flex space-x-8 text-sm">
-              <Link to="/" className={isActive('/')}>Home</Link>
+            {/* Menu Navigasi Desktop */}
+            <div className="hidden md:flex space-x-6 text-[14px]">
+              <Link to="/" className={isActive('/')}>Beranda</Link>
               <Link to="/profil" className={isActive('/profil')}>Profil Desa</Link>
               <Link to="/pemerintahan" className={isActive('/pemerintahan')}>Pemerintahan</Link>
               <Link to="/pengaduan" className={isActive('/pengaduan')}>Pengaduan</Link>
               <Link to="/berita" className={isActive('/berita')}>Berita</Link>
-              <Link to="/galeri" className={isActive('/galeri')}>Galeri</Link> {/* Menu baru */}
+              <Link to="/galeri" className={isActive('/galeri')}>Galeri</Link>
               <Link to="/kontak" className={isActive('/kontak')}>Kontak</Link>
             </div>
 
-            {/* Tombol Call to Action */}
+            {/* Tombol Layanan Mandiri */}
             <div className="hidden md:flex">
-              <button className="bg-[#fbf9f5] text-[#012d1d] px-5 py-2 rounded-lg font-semibold hover:bg-[#e4e2de] transition shadow-sm">
+              <button className="bg-[#012d1d] text-white px-4 py-2 rounded-lg text-[14px] font-semibold hover:bg-[#012d1d]/90 transition-colors shadow-sm">
                 Layanan Mandiri
               </button>
+            </div>
+
+            {/* Menu Mobile dengan Shadcn Sheet (Laci Samping) */}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <button className="text-[#012d1d] flex items-center justify-center p-2">
+                    <Menu className="h-7 w-7" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="bg-[#fbf9f5] border-l-[#c1c8c2]/30 w-[300px]">
+                  <div className="flex flex-col gap-6 mt-10 text-[16px]">
+                    <Link to="/" className={isActive('/')}>Beranda</Link>
+                    <Link to="/profil" className={isActive('/profil')}>Profil Desa</Link>
+                    <Link to="/pemerintahan" className={isActive('/pemerintahan')}>Pemerintahan</Link>
+                    <Link to="/pengaduan" className={isActive('/pengaduan')}>Pengaduan</Link>
+                    <Link to="/berita" className={isActive('/berita')}>Berita</Link>
+                    <Link to="/galeri" className={isActive('/galeri')}>Galeri</Link>
+                    <Link to="/kontak" className={isActive('/kontak')}>Kontak</Link>
+                    <button className="bg-[#012d1d] text-white px-4 py-3 rounded-lg font-semibold mt-4">
+                      Layanan Mandiri
+                    </button>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
             
           </div>
@@ -49,33 +82,48 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      {/* FOOTER */}
-      <footer className="bg-[#012d1d] text-[#e4e2de] py-12 mt-16">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-xl font-bold text-white mb-4">Desa Sukawangi</h3>
-            <p className="text-sm leading-relaxed">
-              Pemerintah Desa Sukawangi, Cianjur. Berdedikasi melayani masyarakat dengan transparan dan profesional.
+      {/* FOOTER: Menggunakan warna Primary Deep Nature Green (#012d1d) */}
+      <footer className="bg-[#012d1d] text-white py-12 mt-20">
+        <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          {/* Kolom Info Desa */}
+          <div className="flex flex-col gap-4">
+            <h3 className="text-[20px] font-semibold text-white">Desa Sukawangi</h3>
+            <p className="text-white/80 text-[16px] max-w-xs leading-relaxed">
+              Pusat informasi dan layanan digital resmi Pemerintah Desa. Membangun desa mandiri, transparan, dan sejahtera.
             </p>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Tautan Penting</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link to="/profil" className="hover:text-white">Tentang Kami</Link></li>
-              <li><Link to="/kebijakan" className="hover:text-white">Kebijakan Privasi</Link></li>
-              <li><Link to="/syarat" className="hover:text-white">Syarat & Ketentuan</Link></li>
-            </ul>
+          
+          {/* Kolom Tautan */}
+          <div className="flex flex-col gap-3">
+            <h3 className="text-[14px] font-semibold text-white mb-2">Tautan Penting</h3>
+            <Link to="/profil" className="text-white/80 hover:text-white transition-opacity text-[16px]">Tentang Kami</Link>
+            <Link to="/kebijakan" className="text-white/80 hover:text-white transition-opacity text-[16px]">Kebijakan Privasi</Link>
+            <Link to="/peta-situs" className="text-white/80 hover:text-white transition-opacity text-[16px]">Peta Situs</Link>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Kontak</h3>
-            <p className="text-sm mb-2">📍 Jl. Desa Sukawangi No. 1, Cianjur</p>
-            <p className="text-sm">✉️ info@sukawangi.desa.id</p>
+          
+          {/* Kolom Kontak (Menggunakan Lucide Icons) */}
+          <div className="flex flex-col gap-3">
+            <h3 className="text-[14px] font-semibold text-white mb-3">Kontak</h3>
+            <div className="text-white/80 text-[16px] flex items-start gap-2">
+              <MapPin className="w-5 h-5 shrink-0" />
+              <p>Jl. Desa Sukawangi No. 1</p>
+            </div>
+            <div className="text-white/80 text-[16px] flex items-center gap-2 mt-1">
+              <Mail className="w-5 h-5 shrink-0" />
+              <p>info@sukawangi.desa.id</p>
+            </div>
           </div>
+          
         </div>
-        <div className="max-w-7xl mx-auto px-4 mt-8 pt-8 border-t border-[#1b4332] text-sm text-center">
+        
+        <div className="max-w-[1200px] mx-auto px-6 mt-8 pt-8 border-t border-white/20 text-center text-white/60 text-sm">
           <p>© 2026 Pemerintah Desa Sukawangi, Cianjur. Seluruh Hak Cipta Dilindungi.</p>
         </div>
       </footer>
+      
+      {/* Elemen global untuk memunculkan Alert/Toast di seluruh web */}
+      <Toaster position="top-right" richColors />
     </div>
   );
 }

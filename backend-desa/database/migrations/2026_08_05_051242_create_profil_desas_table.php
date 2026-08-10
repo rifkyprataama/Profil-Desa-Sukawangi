@@ -10,16 +10,11 @@ return new class extends Migration
     {
         Schema::create('profil_desas', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_desa');
-            $table->text('sejarah')->nullable();
+            $table->string('nama_kepala_desa')->nullable();
+            $table->string('foto_kepala_desa')->nullable();
+            $table->text('sambutan')->nullable();
             $table->text('visi')->nullable();
-            $table->text('misi')->nullable();
-            $table->integer('total_penduduk')->nullable(); 
-            $table->string('luas_wilayah')->nullable();    
-            $table->integer('jumlah_dusun')->nullable();   
-            $table->text('alamat')->nullable();
-            $table->string('no_telepon')->nullable();
-            $table->string('email')->nullable();
+            $table->longText('misi')->nullable();
             $table->timestamps();
         });
     }
