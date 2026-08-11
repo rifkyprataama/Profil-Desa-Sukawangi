@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { 
   History, Target, Eye, MapPin, Map, Users, AreaChart, 
   Compass, BookOpen, HeartPulse, Building2, Landmark,
-  ArrowRight, PhoneCall, Megaphone
+  ArrowRight, PhoneCall, Megaphone, Home
 } from 'lucide-react';
 
 export default function Profil() {
@@ -93,7 +93,6 @@ export default function Profil() {
                     Jejak Langkah & Perkembangan Desa Sukawangi
                   </h3>
                   
-                  {/* PERBAIKAN TIPOGRAFI HTML (Custom Tailwind CSS) */}
                   <div className="text-[#414844] text-[16px] md:text-[18px] leading-[1.8]
                     [&>p]:mb-6 
                     [&>strong]:text-[#012d1d] [&>strong]:font-bold
@@ -123,16 +122,24 @@ export default function Profil() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="bg-white border border-[#c1c8c2]/50 p-6 rounded-2xl shadow-sm text-center flex flex-col items-center">
-                      <AreaChart className="w-8 h-8 text-[#835336] mb-3" />
-                      <h4 className="text-[28px] font-extrabold text-[#012d1d] mb-1">450</h4>
-                      <p className="text-[13px] font-bold text-[#717973] uppercase tracking-wide">Hektar Luas</p>
+                  {/* REVISI: Penambahan Lahan Dihuni */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white border border-[#c1c8c2]/50 p-5 rounded-2xl shadow-sm text-center flex flex-col items-center hover:border-[#835336] transition-colors">
+                      <AreaChart className="w-8 h-8 text-[#835336] mb-2" />
+                      <h4 className="text-[24px] font-extrabold text-[#012d1d] mb-1">450</h4>
+                      <p className="text-[12px] font-bold text-[#717973] uppercase tracking-wide">Total Hektar</p>
                     </div>
-                    <div className="bg-white border border-[#c1c8c2]/50 p-6 rounded-2xl shadow-sm text-center flex flex-col items-center">
-                      <Building2 className="w-8 h-8 text-[#003f63] mb-3" />
-                      <h4 className="text-[28px] font-extrabold text-[#012d1d] mb-1">4 / 12</h4>
-                      <p className="text-[13px] font-bold text-[#717973] uppercase tracking-wide">Dusun / RW</p>
+                    
+                    <div className="bg-white border border-[#c1c8c2]/50 p-5 rounded-2xl shadow-sm text-center flex flex-col items-center hover:border-[#1b4332] transition-colors">
+                      <Home className="w-8 h-8 text-[#1b4332] mb-2" />
+                      <h4 className="text-[24px] font-extrabold text-[#012d1d] mb-1">120</h4>
+                      <p className="text-[12px] font-bold text-[#717973] uppercase tracking-wide">Hektar Dihuni</p>
+                    </div>
+                    
+                    <div className="bg-white border border-[#c1c8c2]/50 p-5 rounded-2xl shadow-sm text-center flex flex-col items-center col-span-2 hover:border-[#003f63] transition-colors">
+                      <Building2 className="w-8 h-8 text-[#003f63] mb-2" />
+                      <h4 className="text-[24px] font-extrabold text-[#012d1d] mb-1">4 Dusun / 12 RW</h4>
+                      <p className="text-[12px] font-bold text-[#717973] uppercase tracking-wide">Pembagian Wilayah Administrasi</p>
                     </div>
                   </div>
                 </div>
@@ -207,7 +214,6 @@ export default function Profil() {
                     <div className="w-16 h-16 bg-white text-[#012d1d] rounded-2xl flex items-center justify-center shadow-lg transform rotate-6"><Target className="w-8 h-8" /></div>
                     <h3 className="text-[28px] font-bold text-white">Misi</h3>
                   </div>
-                  {/* PERBAIKAN TIPOGRAFI HTML TEMA GELAP */}
                   <div className="text-white/80 text-[16px] leading-[1.8]
                     [&>p]:mb-4 
                     [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:mb-4 [&>ul>li]:mb-1
@@ -284,7 +290,7 @@ export default function Profil() {
             </div>
           </section>
 
-          {/* 7. BOTTOM CTA (Fitur Alur Navigasi Baru) */}
+          {/* 7. BOTTOM CTA */}
           <section className="py-16 bg-white border-t border-[#c1c8c2]/30">
             <div className="max-w-[1200px] mx-auto px-6 text-center flex flex-col items-center">
               <h2 className="text-[24px] font-bold text-[#012d1d] mb-3">Butuh Bantuan atau Informasi Lebih Lanjut?</h2>

@@ -1,348 +1,331 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Megaphone, Info, Quote, Eye, Target, ArrowRight, 
-  Tractor, Store, Mountain, Headset, FileEdit, 
-  Newspaper, Calendar, ArrowRightCircle 
+  ArrowRight, Landmark, Users, Megaphone, 
+  Newspaper, ShieldCheck, Target, Eye,
+  Building2, HardHat, HeartHandshake, Leaf, AlertTriangle,
+  ChevronRight, Activity
 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 
 export default function Beranda() {
-  const [profilDesa, setProfilDesa] = useState(null);
-  const [beritaTerbaru, setBeritaTerbaru] = useState([]);
-  
-  // State untuk mengontrol animasi loading
-  const [loadingProfil, setLoadingProfil] = useState(true);
-  const [loadingBerita, setLoadingBerita] = useState(true);
-
-  // Menggunakan Environment Variable untuk URL API (agar aman saat di-hosting)
-  // Fallback ke localhost:8000 jika .env belum dibuat
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Fetch Profil
-    fetch(`${API_URL}/api/profil-desa`)
-      .then(response => response.json())
-      .then(res => {
-        setProfilDesa(res.data || res);
-        setLoadingProfil(false);
-      })
-      .catch(error => {
-        console.error('Error Profil:', error);
-        setLoadingProfil(false);
-      });
+    window.scrollTo(0, 0);
+    setTimeout(() => {
+      setLoading(false);
+    }, 800);
+  }, []);
 
-    // 2. Fetch Berita
-    fetch(`${API_URL}/api/berita`)
-      .then(response => response.json())
-      .then(res => {
-        const dataBerita = res.data?.data || res.data || res;
-        if (Array.isArray(dataBerita)) {
-          setBeritaTerbaru(dataBerita.slice(0, 3));
-        }
-        setLoadingBerita(false); // Matikan loading saat data selesai diambil
-      })
-      .catch(error => {
-        console.error('Error Berita:', error);
-        setLoadingBerita(false); // Matikan loading jika terjadi error
-      });
-  }, [API_URL]);
+  // Data Dummy Berita Terbaru
+  const beritaTerbaru = [
+    { id: 1, judul: 'Penyaluran BLT Dana Desa Tahap III Berjalan Lancar', tanggal: '10 Aug 2026', kategori: 'Sosial', gambar: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=600&auto=format&fit=crop' },
+    { id: 2, judul: 'Kerja Bakti Rutin Warga Dusun II', tanggal: '08 Aug 2026', kategori: 'Kegiatan Warga', gambar: 'https://images.unsplash.com/photo-1593409951662-8e7c10b067d3?q=80&w=600&auto=format&fit=crop' },
+    { id: 3, judul: 'Peresmian Jembatan Gantung Desa Sukawangi', tanggal: '05 Aug 2026', kategori: 'Infrastruktur', gambar: 'https://images.unsplash.com/photo-1541888086225-ee81fb60195a?q=80&w=600&auto=format&fit=crop' }
+  ];
 
   return (
-    <div className="bg-[#fbf9f5] text-[#1b1c1a] font-['Inter'] flex flex-col">
+    <div className="bg-[#fbf9f5] text-[#1b1c1a] font-['Inter'] flex flex-col min-h-screen relative overflow-hidden">
       
-      {/* 1. HERO SECTION */}
-      <section className="relative h-[600px] md:h-[700px] w-full flex items-center justify-center">
-        <div className="absolute inset-0 z-0 bg-[#012d1d]/30">
-          <div className="bg-cover bg-center w-full h-full object-cover" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920&auto=format&fit=crop')` }}></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#fbf9f5] via-[#fbf9f5]/50 to-transparent"></div>
+      {/* 1. HERO SECTION (Revisi: Background Depan Kantor Desa) */}
+      <section className="relative h-[85vh] min-h-[600px] w-full flex items-center justify-center mt-0">
+        <div className="absolute inset-0 z-0 bg-[#012d1d]/80">
+          <img 
+            // Gambar sementara representasi kantor instansi, nanti diganti foto balai desa asli dari admin
+            src="https://images.unsplash.com/photo-1577563908411-50cb989766a3?q=80&w=1920&auto=format&fit=crop" 
+            alt="Depan Kantor Desa Sukawangi" 
+            className="w-full h-full object-cover mix-blend-overlay grayscale-[10%]"
+          />
         </div>
-        <div className="relative z-10 max-w-[1200px] mx-auto px-6 text-center flex flex-col items-center mt-16">
-          <h1 className="text-[36px] leading-[44px] md:text-[56px] md:leading-[64px] font-extrabold tracking-tight text-[#012d1d] mb-6 drop-shadow-sm">
-            Selamat Datang di<br />Desa Sukawangi
+        
+        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-10">
+          <div className="inline-flex items-center gap-2 bg-[#febe9b]/20 backdrop-blur-md text-[#febe9b] border border-[#febe9b]/30 px-5 py-2 rounded-full text-[13px] font-bold uppercase tracking-widest mb-6 shadow-sm">
+            <Landmark className="w-4 h-4" /> Selamat Datang di
+          </div>
+          <h1 className="text-[46px] md:text-[64px] font-extrabold text-white leading-tight drop-shadow-lg mb-6">
+            Website Resmi<br/>Desa Sukawangi
           </h1>
-          <p className="text-[18px] leading-[28px] md:text-[20px] md:leading-[32px] text-[#274e3d] font-medium max-w-2xl mb-10">
-            Harmoni kehidupan agraris dengan tata kelola digital yang modern, transparan, dan responsif terhadap masyarakat.
+          <p className="text-[16px] md:text-[20px] text-white/90 leading-relaxed max-w-2xl mx-auto mb-10 font-medium">
+            Wadah layanan publik dan transparansi informasi untuk mewujudkan masyarakat Desa Sukawangi yang mandiri, sejahtera, dan berbudaya.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/pengaduan" className="bg-[#012d1d] text-white text-[15px] font-semibold px-8 py-3.5 rounded-lg hover:bg-[#012d1d]/90 transition-colors shadow-lg flex items-center justify-center gap-2">
-              <Megaphone className="w-5 h-5" /> Layanan Pengaduan
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/pengaduan" className="w-full sm:w-auto bg-[#febe9b] text-[#331200] px-8 py-4 rounded-xl font-bold hover:bg-[#f8b895] transition-all shadow-lg flex items-center justify-center gap-2">
+              <Megaphone className="w-5 h-5" /> Buat Pengaduan
             </Link>
-            <Link to="/profil" className="bg-white text-[#012d1d] text-[15px] font-semibold px-8 py-3.5 rounded-lg border border-[#c1c8c2] hover:bg-[#efeeea] transition-colors shadow-sm flex items-center justify-center gap-2">
-              <Info className="w-5 h-5" /> Profil Desa
+            <Link to="/profil" className="w-full sm:w-auto bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-xl font-bold hover:bg-white/20 transition-all shadow-lg flex items-center justify-center gap-2">
+              Lebih Kenal Desa <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 2. SAMBUTAN KEPALA DESA */}
-      <section className="py-20 bg-[#fbf9f5]">
-        <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
-          {loadingProfil ? (
-            <div className="w-full flex flex-col md:flex-row items-center gap-12 animate-pulse">
-              <div className="md:w-1/3 flex justify-center"><div className="w-64 h-64 md:w-80 md:h-80 bg-[#e4e2de] rounded-full"></div></div>
-              <div className="md:w-2/3 text-center md:text-left w-full space-y-4">
-                <div className="h-6 bg-[#e4e2de] w-48 rounded mx-auto md:mx-0"></div>
-                <div className="h-8 bg-[#e4e2de] w-3/4 rounded mx-auto md:mx-0 mb-6"></div>
-                <div className="space-y-3"><div className="h-4 bg-[#e4e2de] w-full rounded"></div><div className="h-4 bg-[#e4e2de] w-full rounded"></div></div>
-              </div>
+      {/* 2. MENU CEPAT (Quick Links) */}
+      <section className="relative z-20 -mt-20 max-w-[1200px] mx-auto px-6 w-full">
+        <div className="bg-white rounded-3xl shadow-xl border border-[#c1c8c2]/50 p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-0 justify-between">
+          <Link to="/pemerintahan" className="flex-1 flex flex-col items-center text-center p-4 group hover:bg-[#fbf9f5] rounded-2xl transition-colors">
+            <div className="w-14 h-14 bg-[#012d1d]/10 rounded-2xl flex items-center justify-center text-[#012d1d] mb-4 group-hover:scale-110 transition-transform">
+              <Users className="w-7 h-7" />
             </div>
-          ) : profilDesa ? (
-            <>
-              <div className="md:w-1/3 flex justify-center">
-                <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-[#efeeea] shadow-sm">
-                  <img 
-                    className="object-cover w-full h-full bg-[#e4e2de]" 
-                    src={profilDesa.foto_kepala_desa ? `${API_URL}/storage/${profilDesa.foto_kepala_desa}` : 'https://via.placeholder.com/400'} 
-                    alt="Kepala Desa"
-                    loading="lazy"
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400?text=Foto+Tidak+Tersedia'; }}
-                  />
-                </div>
-              </div>
-              <div className="md:w-2/3 text-center md:text-left">
-                <div className="flex items-center gap-2 text-[#835336] mb-2 justify-center md:justify-start">
-                  <Quote className="w-6 h-6" />
-                  <span className="text-[14px] font-bold uppercase tracking-wider">Sambutan Kepala Desa</span>
-                </div>
-                <h2 className="text-[28px] font-bold text-[#012d1d] mb-4">Membangun Desa Bersama</h2>
-                <p className="text-[18px] text-[#414844] mb-8 leading-relaxed italic">"{profilDesa.sambutan}"</p>
-                <div className="inline-block border-l-4 border-[#012d1d] pl-4 text-left">
-                  <p className="text-[16px] text-[#012d1d] font-bold">{profilDesa.nama_kepala_desa}</p>
-                  <p className="text-[14px] text-[#717973] font-medium">Kepala Desa Sukawangi</p>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="w-full text-center py-10 text-[#414844]">Gagal memuat profil desa.</div>
-          )}
+            <h3 className="font-bold text-[#012d1d] text-[16px]">Pemerintahan</h3>
+            <p className="text-[13px] text-[#717973] mt-1">Struktur & Aparatur</p>
+          </Link>
+          
+          <div className="hidden md:block w-px bg-[#c1c8c2]/40 my-4"></div>
+
+          <Link to="/profil" className="flex-1 flex flex-col items-center text-center p-4 group hover:bg-[#fbf9f5] rounded-2xl transition-colors">
+            <div className="w-14 h-14 bg-[#835336]/10 rounded-2xl flex items-center justify-center text-[#835336] mb-4 group-hover:scale-110 transition-transform">
+              <Landmark className="w-7 h-7" />
+            </div>
+            <h3 className="font-bold text-[#012d1d] text-[16px]">Profil Desa</h3>
+            <p className="text-[13px] text-[#717973] mt-1">Sejarah & Demografi</p>
+          </Link>
+
+          <div className="hidden md:block w-px bg-[#c1c8c2]/40 my-4"></div>
+
+          <Link to="/berita" className="flex-1 flex flex-col items-center text-center p-4 group hover:bg-[#fbf9f5] rounded-2xl transition-colors">
+            <div className="w-14 h-14 bg-[#003f63]/10 rounded-2xl flex items-center justify-center text-[#003f63] mb-4 group-hover:scale-110 transition-transform">
+              <Newspaper className="w-7 h-7" />
+            </div>
+            <h3 className="font-bold text-[#012d1d] text-[16px]">Kabar Desa</h3>
+            <p className="text-[13px] text-[#717973] mt-1">Informasi & Berita</p>
+          </Link>
         </div>
       </section>
 
-      {/* 3. VISI & MISI BENTO GRID */}
-      <section className="py-20 bg-[#f5f3ef]">
+      {/* 3. PROFIL KADES + VISI MISI (Revisi: Digabungkan dalam satu seksi) */}
+      <section className="py-24 bg-[#fbf9f5]">
         <div className="max-w-[1200px] mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-[28px] font-bold text-[#012d1d] mb-2">Visi & Misi</h2>
-            <p className="text-[16px] text-[#414844]">Arah pembangunan Desa Sukawangi</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#fbf9f5] rounded-xl p-10 md:p-12 border border-[#c1c8c2]/40 shadow-sm md:col-span-2 flex flex-col justify-center transition-transform hover:-translate-y-1 hover:shadow-md duration-300">
-              <div className="w-14 h-14 rounded-full bg-[#1b4332]/10 flex items-center justify-center mb-6 text-[#012d1d]">
-                <Eye className="w-7 h-7" />
+          <div className="bg-white rounded-3xl border border-[#c1c8c2]/40 shadow-sm overflow-hidden flex flex-col lg:flex-row">
+            
+            {/* Foto Kepala Desa */}
+            <div className="lg:w-2/5 relative min-h-[400px] bg-[#e4e2de]">
+              <img 
+                src="https://images.unsplash.com/photo-1555848962-6e79363ec58f?q=80&w=800&auto=format&fit=crop" 
+                alt="Kepala Desa Sukawangi" 
+                className="absolute inset-0 w-full h-full object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#012d1d] via-[#012d1d]/40 to-transparent flex flex-col justify-end p-8">
+                <span className="bg-[#febe9b] text-[#331200] text-[12px] font-bold px-3 py-1 rounded-full w-max mb-3 shadow-sm">
+                  Periode 2022 - 2028
+                </span>
+                <h3 className="text-[28px] font-bold text-white mb-1">Ahmad Sunarya</h3>
+                <p className="text-[16px] text-white/80 font-medium">Kepala Desa Sukawangi</p>
               </div>
-              <h3 className="text-[20px] font-bold text-[#012d1d] mb-4 uppercase tracking-wide">Visi</h3>
-              {loadingProfil ? (
-                <div className="h-8 bg-[#e4e2de] w-3/4 rounded animate-pulse"></div>
-              ) : (
-                <p className="text-[28px] md:text-[32px] font-bold italic text-[#012d1d]/90 leading-snug">
-                  "{profilDesa ? profilDesa.visi : 'Visi belum tersedia'}"
-                </p>
-              )}
             </div>
-            <div className="flex flex-col gap-6">
-              <div className="bg-[#fbf9f5] rounded-xl p-8 border border-[#c1c8c2]/40 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-md duration-300 h-full flex flex-col">
-                <div className="flex items-start gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-full bg-[#febe9b]/30 flex items-center justify-center shrink-0 text-[#835336]">
-                    <Target className="w-5 h-5" />
+
+            {/* Sambutan & Visi Misi */}
+            <div className="lg:w-3/5 p-8 md:p-12 flex flex-col justify-center">
+              <div className="flex items-center gap-3 mb-6">
+                <ShieldCheck className="w-8 h-8 text-[#835336]" />
+                <h2 className="text-[28px] font-bold text-[#012d1d]">Sambutan Kepala Desa</h2>
+              </div>
+              <p className="text-[16px] text-[#414844] leading-relaxed mb-10 italic border-l-4 border-[#835336] pl-6 bg-[#fbf9f5] py-4 pr-4 rounded-r-xl">
+                "Selamat datang di portal resmi Desa Sukawangi. Kami berkomitmen untuk terus berinovasi dalam memberikan pelayanan terbaik, transparan, dan akuntabel kepada seluruh warga masyarakat demi kemajuan desa yang kita cintai."
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Visi */}
+                <div className="bg-[#012d1d] p-8 rounded-2xl shadow-lg relative overflow-hidden group">
+                  <Eye className="absolute -bottom-4 -right-4 w-24 h-24 text-white/5 group-hover:scale-110 transition-transform" />
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 bg-[#febe9b] rounded-lg flex items-center justify-center text-[#331200]">
+                      <Eye className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-[20px] font-bold text-white">Visi</h3>
                   </div>
-                  <h4 className="text-[16px] font-bold text-[#012d1d] mt-2 uppercase tracking-wide">Misi Utama</h4>
+                  <p className="text-[15px] font-semibold text-white/90 leading-relaxed italic">
+                    "Terwujudnya Desa Sukawangi yang Mandiri, Sejahtera, Agamis, dan Berbudaya berbasis Pertanian dan Teknologi."
+                  </p>
                 </div>
-                {loadingProfil ? (
-                   <div className="space-y-3 animate-pulse ml-[52px]">
-                      <div className="h-4 bg-[#e4e2de] w-full rounded"></div>
-                      <div className="h-4 bg-[#e4e2de] w-full rounded"></div>
-                      <div className="h-4 bg-[#e4e2de] w-2/3 rounded"></div>
-                   </div>
-                ) : profilDesa ? (
-                  <div className="text-[15px] text-[#414844] prose prose-sm max-w-none ml-[52px] line-clamp-6 flex-grow" dangerouslySetInnerHTML={{ __html: profilDesa.misi }} />
-                ) : (
-                  <p className="text-[15px] text-[#414844] ml-[52px]">Misi belum tersedia</p>
-                )}
-                <Link to="/profil" className="text-[#012d1d] font-semibold text-[14px] mt-6 ml-[52px] flex items-center gap-1 group">
-                  Lihat Detail <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
+
+                {/* Misi */}
+                <div className="bg-[#f5f3ef] border border-[#c1c8c2] p-8 rounded-2xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 bg-[#012d1d] rounded-lg flex items-center justify-center text-white">
+                      <Target className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-[20px] font-bold text-[#012d1d]">Misi Utama</h3>
+                  </div>
+                  <ul className="text-[14px] text-[#414844] space-y-3 font-medium">
+                    <li className="flex items-start gap-2">
+                      <span className="text-[#835336] font-bold mt-0.5">•</span>
+                      Meningkatkan kualitas tata kelola pemerintahan yang bersih.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-[#835336] font-bold mt-0.5">•</span>
+                      Meningkatkan pembangunan infrastruktur desa.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-[#835336] font-bold mt-0.5">•</span>
+                      Pemberdayaan ekonomi kerakyatan & UMKM.
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
+            
           </div>
         </div>
       </section>
 
-      {/* 4. KEKAYAAN & POTENSI DESA */}
-      <section className="py-20 bg-[#fbf9f5]">
+      {/* 4. TRANSPARANSI APBDES (Revisi: Realisasi Pendapatan & 5 Bidang) */}
+      <section className="py-24 bg-[#012d1d] text-white relative overflow-hidden">
+        {/* Dekorasi Latar Belakang */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#1b4332] rounded-full blur-3xl opacity-50 translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+        
+        <div className="max-w-[1200px] mx-auto px-6 relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 border-b border-white/20 pb-8">
+            <div className="max-w-2xl">
+              <h2 className="text-[32px] md:text-[40px] font-bold mb-4">Transparansi Keuangan & Program Desa</h2>
+              <p className="text-[16px] text-white/80 leading-relaxed">
+                Wujud komitmen pemerintahan desa yang akuntabel. Berikut adalah realisasi pendapatan desa dan fokus pelaksanaan 5 bidang program kerja Tahun Anggaran 2026.
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-full flex items-center gap-3">
+              <Activity className="w-5 h-5 text-[#febe9b]" />
+              <span className="text-[14px] font-bold tracking-wider uppercase">TA 2026</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            
+            {/* Realisasi Pendapatan */}
+            <div className="lg:col-span-1 bg-[#febe9b] rounded-3xl p-8 text-[#331200] flex flex-col justify-center shadow-2xl transform lg:-translate-y-6">
+              <h3 className="text-[18px] font-bold mb-2 uppercase tracking-wide opacity-80">Realisasi Pendapatan</h3>
+              <p className="text-[42px] font-black leading-tight mb-6">Rp 1.85 M</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-[14px] font-bold mb-1">
+                    <span>Dana Desa (DD)</span>
+                    <span>65%</span>
+                  </div>
+                  <div className="w-full bg-black/10 rounded-full h-2">
+                    <div className="bg-[#331200] h-2 rounded-full" style={{ width: '65%' }}></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-[14px] font-bold mb-1">
+                    <span>Alokasi Dana Desa (ADD)</span>
+                    <span>25%</span>
+                  </div>
+                  <div className="w-full bg-black/10 rounded-full h-2">
+                    <div className="bg-[#331200] h-2 rounded-full" style={{ width: '25%' }}></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-[14px] font-bold mb-1">
+                    <span>Pendapatan Asli Desa (PADes)</span>
+                    <span>10%</span>
+                  </div>
+                  <div className="w-full bg-black/10 rounded-full h-2">
+                    <div className="bg-[#331200] h-2 rounded-full" style={{ width: '10%' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 5 Bidang Program Kerja */}
+            <div className="lg:col-span-2">
+              <h3 className="text-[20px] font-bold mb-6 text-white border-l-4 border-[#febe9b] pl-4">Fokus 5 Bidang Program Kerja</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                <div className="bg-white/5 border border-white/10 hover:bg-white/10 p-5 rounded-2xl flex items-start gap-4 transition-colors">
+                  <div className="bg-[#cde5ff]/20 p-3 rounded-xl text-[#cde5ff] shrink-0">
+                    <Building2 className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-[16px] mb-1">Penyelenggaraan Pemerintahan</h4>
+                    <p className="text-[13px] text-white/70">Operasional kantor desa, pelayanan publik, dan insentif aparatur.</p>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 hover:bg-white/10 p-5 rounded-2xl flex items-start gap-4 transition-colors">
+                  <div className="bg-[#febe9b]/20 p-3 rounded-xl text-[#febe9b] shrink-0">
+                    <HardHat className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-[16px] mb-1">Pelaksanaan Pembangunan</h4>
+                    <p className="text-[13px] text-white/70">Infrastruktur fisik seperti jalan desa, irigasi, dan balai dusun.</p>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 hover:bg-white/10 p-5 rounded-2xl flex items-start gap-4 transition-colors">
+                  <div className="bg-green-500/20 p-3 rounded-xl text-green-400 shrink-0">
+                    <HeartHandshake className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-[16px] mb-1">Pembinaan Kemasyarakatan</h4>
+                    <p className="text-[13px] text-white/70">Pembinaan RT/RW, Karang Taruna, PKK, dan keamanan desa.</p>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 hover:bg-white/10 p-5 rounded-2xl flex items-start gap-4 transition-colors">
+                  <div className="bg-purple-500/20 p-3 rounded-xl text-purple-400 shrink-0">
+                    <Leaf className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-[16px] mb-1">Pemberdayaan Masyarakat</h4>
+                    <p className="text-[13px] text-white/70">Pelatihan UMKM, kelompok tani, dan peningkatan kapasitas warga.</p>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 hover:bg-white/10 p-5 rounded-2xl flex items-start gap-4 transition-colors sm:col-span-2 md:w-1/2 md:justify-self-center">
+                  <div className="bg-red-500/20 p-3 rounded-xl text-red-400 shrink-0">
+                    <AlertTriangle className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-[16px] mb-1">Bencana & Keadaan Darurat</h4>
+                    <p className="text-[13px] text-white/70">Dana siaga penanggulangan bencana alam dan kebutuhan mendesak desa.</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 5. BERITA TERBARU */}
+      <section className="py-24 bg-[#fbf9f5]">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <h2 className="text-[28px] font-bold text-[#012d1d] mb-2">Potensi Unggulan</h2>
-              <p className="text-[16px] text-[#414844]">Kekayaan alam dan produk lokal desa</p>
+              <h2 className="text-[32px] font-bold text-[#012d1d] mb-2">Kabar Terbaru</h2>
+              <p className="text-[#414844] text-[16px]">Informasi dan berita terkini seputar Desa Sukawangi.</p>
             </div>
-            <Link to="/profil" className="hidden md:flex items-center gap-1 text-[14px] font-semibold text-[#012d1d] hover:text-[#1b4332] transition-colors group">
-              Telusuri <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <Link to="/berita" className="hidden md:flex items-center gap-2 text-[#012d1d] font-bold hover:text-[#835336] transition-colors group">
+              Lihat Semua <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex flex-col items-center text-center p-10 border border-[#c1c8c2]/40 rounded-xl hover:bg-[#1b4332]/5 transition-all duration-300 hover:shadow-md cursor-pointer group">
-              <div className="w-16 h-16 rounded-full bg-[#1b4332]/10 flex items-center justify-center text-[#012d1d] mb-5 group-hover:scale-110 transition-transform"><Tractor className="w-8 h-8"/></div>
-              <h3 className="text-[18px] font-bold text-[#012d1d] mb-3">Pertanian Padi Organik</h3>
-              <p className="text-[15px] text-[#414844] leading-relaxed">Menghasilkan beras kualitas premium dengan sistem irigasi alami pegunungan.</p>
-            </div>
-            <div className="flex flex-col items-center text-center p-10 border border-[#c1c8c2]/40 rounded-xl hover:bg-[#835336]/5 transition-all duration-300 hover:shadow-md cursor-pointer group">
-              <div className="w-16 h-16 rounded-full bg-[#febe9b]/30 flex items-center justify-center text-[#835336] mb-5 group-hover:scale-110 transition-transform"><Store className="w-8 h-8"/></div>
-              <h3 className="text-[18px] font-bold text-[#835336] mb-3">UMKM Kripik Singkong</h3>
-              <p className="text-[15px] text-[#414844] leading-relaxed">Pusat produksi kripik lokal yang memberdayakan ekonomi warga desa secara mandiri.</p>
-            </div>
-            <div className="flex flex-col items-center text-center p-10 border border-[#c1c8c2]/40 rounded-xl hover:bg-[#003f63]/5 transition-all duration-300 hover:shadow-md cursor-pointer group">
-              <div className="w-16 h-16 rounded-full bg-[#cde5ff] flex items-center justify-center text-[#002842] mb-5 group-hover:scale-110 transition-transform"><Mountain className="w-8 h-8"/></div>
-              <h3 className="text-[18px] font-bold text-[#002842] mb-3">Wisata Alam Curug</h3>
-              <p className="text-[15px] text-[#414844] leading-relaxed">Potensi wisata air terjun asri yang dikelola langsung oleh unit usaha BUMDes.</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* 5. CALL TO ACTION */}
-      <section className="py-12 bg-[#fbf9f5]">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="bg-[#012d1d] text-white rounded-2xl p-10 md:p-14 flex flex-col md:flex-row items-center justify-between shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 opacity-10 transform translate-x-1/4 -translate-y-1/4"><Headset className="w-64 h-64" /></div>
-            <div className="mb-8 md:mb-0 md:mr-10 relative z-10 text-center md:text-left">
-              <h2 className="text-[28px] font-bold mb-4 flex items-center justify-center md:justify-start gap-3">
-                Layanan Pengaduan Warga
-              </h2>
-              <p className="text-[16px] text-white/80 max-w-2xl leading-relaxed">Ada infrastruktur rusak, masalah pelayanan, atau kejadian darurat di lingkungan Anda? Laporkan segera secara online agar ditindaklanjuti.</p>
-            </div>
-            <Link to="/pengaduan" className="relative z-10 bg-[#febe9b] text-[#331200] text-[15px] font-bold px-8 py-4 rounded-lg hover:bg-[#f8b895] hover:scale-105 transition-all shadow-md whitespace-nowrap flex items-center gap-2">
-              <FileEdit className="w-5 h-5" /> Buat Laporan Baru
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. KABAR DESA TERKINI */}
-      <section className="py-20 bg-[#f5f3ef]">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex justify-between items-end mb-12">
-            <div><h2 className="text-[28px] font-bold text-[#012d1d] mb-2">Kabar Desa Terkini</h2><p className="text-[16px] text-[#414844]">Update informasi dari balai desa</p></div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {loadingBerita ? (
-              /* SKELETON BERITA */
-              [1, 2, 3].map((item) => (
-                <div key={item} className="bg-[#fbf9f5] rounded-xl border border-[#c1c8c2]/40 p-5 h-[400px] flex flex-col gap-4 animate-pulse">
-                  <div className="w-full h-48 bg-[#e4e2de] rounded-lg"></div>
-                  <div className="w-1/3 h-4 bg-[#e4e2de] rounded"></div>
-                  <div className="w-full h-6 bg-[#e4e2de] rounded mt-2"></div>
-                  <div className="w-5/6 h-6 bg-[#e4e2de] rounded"></div>
-                  <div className="mt-auto w-full h-4 bg-[#e4e2de] rounded"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {beritaTerbaru.map((berita) => (
+              <Link to={`/berita/${berita.id}`} key={berita.id} className="group bg-white rounded-2xl overflow-hidden border border-[#c1c8c2]/40 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
+                <div className="h-56 overflow-hidden relative bg-[#e4e2de]">
+                  <img src={berita.gambar} alt={berita.judul} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
+                  <div className="absolute top-4 left-4 bg-white/95 backdrop-blur text-[#012d1d] text-[12px] font-bold px-3 py-1.5 rounded-md">
+                    {berita.kategori}
+                  </div>
                 </div>
-              ))
-            ) : beritaTerbaru.length > 0 ? (
-              beritaTerbaru.map((item, index) => (
-                <Dialog key={index}>
-                  
-                  {/* TRIGGER (KARTU BERITA) */}
-                  <DialogTrigger asChild>
-                    <div className="bg-[#fbf9f5] rounded-xl overflow-hidden border border-[#c1c8c2]/40 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group transform hover:-translate-y-2 cursor-pointer text-left h-full">
-                      <div className="h-52 w-full overflow-hidden relative shrink-0">
-                        {/* PENANGANAN GAMBAR LAZY LOAD & ONERROR */}
-                        <img 
-                          src={item.gambar ? `${API_URL}/storage/${item.gambar}` : 'https://via.placeholder.com/400x300?text=Berita'} 
-                          alt={item.judul} 
-                          loading="lazy"
-                          onError={(e) => {
-                            e.target.onerror = null; 
-                            e.target.src = 'https://via.placeholder.com/400x300?text=Gambar+Tidak+Tersedia';
-                          }}
-                          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700 ease-in-out bg-[#e4e2de]" 
-                        />
-                        <div className="absolute top-4 right-4 bg-[#fbf9f5]/95 backdrop-blur text-[#012d1d] text-[12px] font-bold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-1">
-                          <Newspaper className="w-4 h-4" /> Info Desa
-                        </div>
-                      </div>
-                      <div className="p-7 flex-grow flex flex-col">
-                        <div className="flex items-center gap-2 text-[#717973] mb-4">
-                          <Calendar className="w-4 h-4" />
-                          <p className="text-[13px] font-semibold uppercase tracking-wider">{new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                        </div>
-                        <h3 className="text-[20px] leading-snug font-bold text-[#012d1d] mb-4 line-clamp-2 group-hover:text-[#3f6653] transition-colors">{item.judul}</h3>
-                        <div className="text-[15px] text-[#414844] line-clamp-3 mb-6 prose prose-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: item.isi_berita }} />
-                        <div className="mt-auto pt-5 border-t border-[#e4e2de] flex justify-between items-center text-[#012d1d] font-bold text-[14px]">
-                          <span className="group-hover:text-[#3f6653] transition-colors">Baca Cepat</span>
-                          <ArrowRightCircle className="w-5 h-5 transform group-hover:translate-x-2 transition-transform" />
-                        </div>
-                      </div>
-                    </div>
-                  </DialogTrigger>
-                  
-                  {/* KONTEN POPUP (UI/UX PREMIUM) */}
-                  <DialogContent className="max-w-[750px] w-[95vw] max-h-[85vh] bg-[#fbf9f5] p-0 overflow-hidden flex flex-col rounded-2xl shadow-2xl border-0">
-                    
-                    {/* 1. AREA KONTEN (BISA DI-SCROLL) */}
-                    <div className="overflow-y-auto flex-grow relative">
-                      
-                      {/* Gambar Cover Full Width */}
-                      <div className="relative w-full h-56 md:h-72 bg-[#e4e2de] shrink-0">
-                        <img 
-                          src={item.gambar ? `${API_URL}/storage/${item.gambar}` : 'https://via.placeholder.com/800x400?text=Berita'} 
-                          alt={item.judul} 
-                          loading="lazy"
-                          onError={(e) => {
-                            e.target.onerror = null; 
-                            e.target.src = 'https://via.placeholder.com/800x400?text=Gambar+Tidak+Tersedia';
-                          }}
-                          className="object-cover w-full h-full" 
-                        />
-                        {/* Label Kategori */}
-                        <div className="absolute top-5 left-5 bg-white/95 backdrop-blur text-[#012d1d] text-[12px] font-bold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-1">
-                          <Newspaper className="w-4 h-4" /> Info Desa
-                        </div>
-                        {/* Latar putih transparan di pojok kanan atas agar tombol [X] bawaan shadcn tetap terlihat jelas */}
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-white/70 to-transparent pointer-events-none"></div>
-                      </div>
-
-                      {/* Teks & Judul Berita */}
-                      <div className="p-6 md:p-8 pt-6">
-                        <DialogHeader>
-                          <div className="flex items-center gap-2 text-[#717973] mb-3">
-                            <Calendar className="w-4 h-4" />
-                            <p className="text-[13px] font-bold uppercase tracking-wider">
-                              {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                            </p>
-                          </div>
-                          <DialogTitle className="text-[24px] md:text-[32px] font-extrabold text-[#012d1d] leading-tight mb-2 text-left">
-                            {item.judul}
-                          </DialogTitle>
-                        </DialogHeader>
-                        
-                        <div className="mt-6 prose prose-sm md:prose-base text-[#414844] max-w-none leading-relaxed md:leading-loose text-left" dangerouslySetInnerHTML={{ __html: item.isi_berita }} />
-                      </div>
-                    </div>
-                    
-                    {/* 2. AREA FOOTER (FIXED / SELALU MENEMPEL DI BAWAH) */}
-                    <div className="p-5 md:px-8 border-t border-[#c1c8c2]/40 bg-white shrink-0 flex justify-end shadow-[0_-10px_30px_rgba(0,0,0,0.03)] z-10">
-                      <DialogClose asChild>
-                        <Link to={`/berita/${item.slug || item.id}`} className="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-[#012d1d] text-white px-8 py-3.5 rounded-xl text-[15px] font-bold hover:bg-[#1b4332] active:scale-95 transition-all shadow-md">
-                          Baca Artikel Penuh <ArrowRight className="w-5 h-5" />
-                        </Link>
-                      </DialogClose>
-                    </div>
-
-                  </DialogContent>
-                  
-                </Dialog>
-              ))
-            ) : (
-              <div className="col-span-3 text-center py-16 bg-[#fbf9f5] rounded-xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center justify-center">
-                 <Newspaper className="w-12 h-12 text-[#c1c8c2] mb-4" />
-                <p className="text-[#414844] text-[18px] font-medium">Belum ada kabar berita terbaru saat ini.</p>
-              </div>
-            )}
+                <div className="p-6 flex flex-col flex-grow">
+                  <span className="text-[#717973] text-[13px] font-bold mb-3">{berita.tanggal}</span>
+                  <h3 className="text-[18px] font-extrabold text-[#012d1d] leading-snug mb-4 group-hover:text-[#3f6653] transition-colors line-clamp-2">
+                    {berita.judul}
+                  </h3>
+                  <div className="mt-auto pt-4 border-t border-[#e4e2de] text-[14px] font-bold text-[#012d1d] flex items-center justify-between">
+                    Baca Selengkapnya <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
-
-          <div className="mt-12 text-center">
-            <Link to="/berita" className="inline-flex items-center justify-center gap-2 bg-white text-[15px] font-bold border-2 border-[#e4e2de] text-[#012d1d] px-8 py-3.5 rounded-lg hover:bg-[#efeeea] hover:border-[#c1c8c2] transition-all shadow-sm group">
-              Lihat Semua Berita <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          
+          {/* Tombol Lihat Semua (Versi Mobile) */}
+          <div className="mt-10 md:hidden text-center">
+             <Link to="/berita" className="inline-flex items-center gap-2 text-[#012d1d] border-2 border-[#012d1d] px-6 py-3 rounded-xl font-bold hover:bg-[#012d1d] hover:text-white transition-colors">
+              Lihat Semua Berita <ChevronRight className="w-5 h-5" />
             </Link>
           </div>
         </div>

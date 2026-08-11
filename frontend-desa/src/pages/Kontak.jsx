@@ -73,8 +73,9 @@ export default function Kontak() {
           <div className="inline-flex items-center gap-2 bg-[#febe9b] text-[#331200] px-4 py-1.5 rounded-full text-[13px] font-bold uppercase tracking-widest mb-6 shadow-sm">
             <Phone className="w-4 h-4" /> Hubungi Kami
           </div>
+          {/* REVISI: Perubahan Judul Hero Banner */}
           <h1 className="text-[36px] md:text-[52px] font-extrabold text-white leading-tight drop-shadow-md">
-            Kontak & Lokasi
+            Kontak Pelayanan Desa
           </h1>
         </div>
       </section>
@@ -88,12 +89,13 @@ export default function Kontak() {
         </div>
       </div>
 
-      {/* 3. KARTU INFORMASI UTAMA (Rapi, Tanpa Overlap) */}
+      {/* 3. KARTU INFORMASI UTAMA */}
       <section className="py-16 bg-[#fbf9f5]">
         <div className="max-w-[1200px] mx-auto px-6">
           
           <div className="text-center mb-12">
-            <h2 className="text-[28px] md:text-[32px] font-bold text-[#012d1d] mb-3">Informasi Kontak</h2>
+            {/* REVISI: Perubahan Judul Sub-Seksi */}
+            <h2 className="text-[28px] md:text-[32px] font-bold text-[#012d1d] mb-3">Pusat Informasi Pelayanan</h2>
             <p className="text-[16px] text-[#414844]">Silakan hubungi atau kunjungi kami pada jam operasional kerja.</p>
           </div>
 
@@ -242,7 +244,7 @@ export default function Kontak() {
         </div>
       </section>
 
-      {/* 5. FAQ (Tanya Jawab Umum) - FITUR BARU */}
+      {/* 5. FAQ (Tanya Jawab Umum) */}
       <section className="py-16 bg-white border-t border-[#c1c8c2]/30 flex-grow">
         <div className="max-w-[900px] mx-auto px-6">
           <div className="flex flex-col items-center text-center mb-10">
