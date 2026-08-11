@@ -1,210 +1,222 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  Newspaper, Calendar, ArrowRightCircle, 
+  Search, Home, ChevronRight, FileX, ChevronLeft 
+} from 'lucide-react';
 
 export default function Berita() {
-  const [berita, setBerita] = useState([]);
+  const [beritaList, setBeritaList] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // State untuk Fitur Pencarian & Filter
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState('Semua');
+  
+  // Daftar Kategori (Nanti bisa dinamis dari database)
+  const categories = ['Semua', 'Pemerintahan', 'Pembangunan', 'Sosial', 'Pemberdayaan'];
 
-  // Mengambil data berita dari Backend Laravel
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
   useEffect(() => {
-    fetch('http://localhost:8000/api/berita')
+    window.scrollTo(0, 0);
+
+    fetch(`${API_URL}/api/berita`)
       .then(response => response.json())
       .then(res => {
-        setBerita(res.data || []);
+        const dataBerita = res.data?.data || res.data || res;
+        if (Array.isArray(dataBerita)) {
+          setBeritaList(dataBerita);
+        }
         setLoading(false);
       })
       .catch(error => {
-        console.error('Error:', error);
+        console.error('Error fetching berita:', error);
         setLoading(false);
       });
-  }, []);
+  }, [API_URL]);
 
-  // Memisahkan Berita Utama (berita terbaru/pertama) dan Berita Lainnya
-  const beritaUtama = berita.length > 0 ? berita[0] : null;
-  const beritaLainnya = berita.length > 1 ? berita.slice(1) : [];
+  // Logika Filter (Pencarian Teks + Kategori)
+  const filteredBerita = beritaList.filter((item) => {
+    const matchSearch = item.judul.toLowerCase().includes(searchTerm.toLowerCase());
+    // Simulasi filter kategori (jika backend belum ada kolom kategori, kita anggap semua cocok sementara)
+    const matchCategory = activeCategory === 'Semua' || item.kategori === activeCategory;
+    return matchSearch && matchCategory;
+  });
+
+  const createExcerpt = (htmlString, maxLength = 120) => {
+    if (!htmlString) return '';
+    const plainText = htmlString.replace(/<[^>]+>/g, '');
+    if (plainText.length <= maxLength) return plainText;
+    return plainText.substring(0, maxLength) + '...';
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20">
+    <div className="bg-[#fbf9f5] text-[#1b1c1a] font-['Inter'] flex flex-col min-h-screen">
       
-      {/* JUDUL HALAMAN */}
-      <div className="space-y-3 mb-10">
-        <h1 className="text-4xl font-bold text-[#012d1d]">Berita & Pengumuman</h1>
-        <p className="text-[#414844] max-w-2xl">
-          Kabar terbaru, agenda desa, dan informasi penting untuk warga Desa Sukawangi.
-        </p>
+      {/* 1. HERO BANNER */}
+      <section className="relative h-[300px] md:h-[400px] w-full flex items-center justify-center mt-0">
+        <div className="absolute inset-0 z-0 bg-[#012d1d]/80">
+          <img 
+            src="https://images.unsplash.com/photo-1585241936939-5ea1bc382c9c?q=80&w=1920&auto=format&fit=crop" 
+            alt="Kabar Desa" 
+            className="w-full h-full object-cover mix-blend-overlay grayscale-[30%]"
+          />
+        </div>
+        <div className="relative z-10 text-center px-6 mt-10">
+          <div className="inline-flex items-center gap-2 bg-[#febe9b] text-[#331200] px-4 py-1.5 rounded-full text-[13px] font-bold uppercase tracking-widest mb-6 shadow-sm">
+            <Newspaper className="w-4 h-4" /> Pusat Informasi
+          </div>
+          <h1 className="text-[36px] md:text-[52px] font-extrabold text-white leading-tight drop-shadow-md">
+            Kabar Desa Terkini
+          </h1>
+        </div>
+      </section>
+
+      {/* 2. BREADCRUMB, SEARCH & FILTER */}
+      <div className="bg-white/90 backdrop-blur-md border-b border-[#c1c8c2]/50 sticky top-[80px] z-40 shadow-sm">
+        <div className="max-w-[1200px] mx-auto px-6 py-4">
+          
+          {/* Baris Atas: Breadcrumb & Search */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-2 text-[14px] font-medium text-[#717973] overflow-x-auto whitespace-nowrap hide-scrollbar w-full md:w-auto">
+              <Link to="/" className="hover:text-[#012d1d] flex items-center gap-1"><Home className="w-4 h-4"/> Beranda</Link>
+              <ChevronRight className="w-4 h-4 shrink-0" />
+              <span className="text-[#012d1d] font-bold">Semua Berita</span>
+            </div>
+
+            <div className="relative w-full md:w-96">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                <Search className="w-5 h-5 text-[#717973]" />
+              </div>
+              <input 
+                type="text" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Cari judul berita..."
+                className="w-full bg-[#efeeea] border-none text-[#1b1c1a] text-[14px] rounded-full focus:ring-2 focus:ring-[#012d1d] block pl-11 p-2.5 transition-shadow"
+              />
+            </div>
+          </div>
+
+          {/* Baris Bawah: Filter Kategori (Pill Menu) */}
+          <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`whitespace-nowrap px-5 py-2 rounded-full text-[13px] font-bold transition-colors border ${
+                  activeCategory === cat 
+                    ? 'bg-[#012d1d] text-white border-[#012d1d] shadow-md' 
+                    : 'bg-white text-[#414844] border-[#c1c8c2]/60 hover:bg-[#efeeea]'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* KOLOM KIRI: DAFTAR BERITA (Porsi 2/3) */}
-        <div className="lg:col-span-2 space-y-8">
+      {/* 3. GRID KARTU BERITA */}
+      <section className="py-12 md:py-16">
+        <div className="max-w-[1200px] mx-auto px-6">
           
           {loading ? (
-            <div className="text-center py-20 text-[#414844] animate-pulse bg-white rounded-2xl border border-[#e4e2de]">
-              Memuat kabar terbaru...
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((item) => (
+                <div key={item} className="bg-white rounded-2xl border border-[#c1c8c2]/40 p-5 h-[420px] flex flex-col gap-4 animate-pulse">
+                  <div className="w-full h-48 bg-[#e4e2de] rounded-xl"></div>
+                  <div className="w-1/3 h-4 bg-[#e4e2de] rounded"></div>
+                  <div className="w-full h-6 bg-[#e4e2de] rounded mt-2"></div>
+                  <div className="w-5/6 h-6 bg-[#e4e2de] rounded"></div>
+                  <div className="mt-auto w-full h-10 bg-[#e4e2de] rounded-lg"></div>
+                </div>
+              ))}
             </div>
-          ) : beritaUtama ? (
+          ) : filteredBerita.length > 0 ? (
             <>
-              {/* BERITA UTAMA */}
-              <div className="bg-white rounded-2xl shadow-sm border border-[#e4e2de] overflow-hidden group cursor-pointer hover:shadow-md transition">
-                <div className="h-72 w-full bg-[#e4e2de] relative overflow-hidden">
-                  {beritaUtama.gambar ? (
-                    <img 
-                      src={`http://localhost:8000/storage/${beritaUtama.gambar}`} 
-                      alt={beritaUtama.judul} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl bg-[#c1ecd4]">📰</div>
-                  )}
-                  <div className="absolute top-4 left-4 bg-[#012d1d] text-white text-xs font-bold px-3 py-1 rounded-full">
-                    Berita Utama
-                  </div>
-                </div>
-                <div className="p-6 md:p-8 space-y-4">
-                  <div className="flex items-center gap-2 text-sm text-[#717973] font-medium">
-                    <span>📅 {new Date(beritaUtama.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                    <span>•</span>
-                    <span>Kabar Desa</span>
-                  </div>
-                  <h2 className="text-2xl font-bold text-[#012d1d] group-hover:text-[#3f6653] transition">
-                    {beritaUtama.judul}
-                  </h2>
-                  <p className="text-[#414844] line-clamp-3 leading-relaxed">
-                    {beritaUtama.isi_berita}
-                  </p>
-                  <div className="pt-2">
-                    <span className="text-[#012d1d] font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
-                      Baca Selengkapnya <span className="text-lg">→</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* BERITA LAINNYA (Grid 2 Kolom) */}
-              {beritaLainnya.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {beritaLainnya.map((item) => (
-                    <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-[#e4e2de] overflow-hidden group cursor-pointer hover:shadow-md transition flex flex-col">
-                      <div className="h-48 w-full bg-[#e4e2de] overflow-hidden">
-                        {item.gambar ? (
-                          <img 
-                            src={`http://localhost:8000/storage/${item.gambar}`} 
-                            alt={item.judul} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-3xl bg-[#f5f3ef]">🗞️</div>
-                        )}
-                      </div>
-                      <div className="p-6 flex-grow flex flex-col space-y-3">
-                        <span className="text-xs text-[#717973] font-medium">
-                          📅 {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                        </span>
-                        <h3 className="text-lg font-bold text-[#012d1d] group-hover:text-[#3f6653] transition line-clamp-2 leading-tight">
-                          {item.judul}
-                        </h3>
-                        <p className="text-[#414844] text-sm line-clamp-2 flex-grow">
-                          {item.isi_berita}
-                        </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                {filteredBerita.map((item, index) => (
+                  <Link to={`/berita/${item.slug || item.id}`} key={index} className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-[#c1c8c2]/40 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                    <div className="h-56 w-full overflow-hidden relative shrink-0 bg-[#e4e2de]">
+                      <img 
+                        src={item.gambar ? `${API_URL}/storage/${item.gambar}` : 'https://via.placeholder.com/600x400?text=Berita+Desa'} 
+                        alt={item.judul} 
+                        loading="lazy"
+                        onError={(e) => {
+                          e.target.onerror = null; 
+                          e.target.src = 'https://via.placeholder.com/600x400?text=Gambar+Tidak+Tersedia';
+                        }}
+                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700 ease-in-out" 
+                      />
+                      <div className="absolute top-4 left-4 bg-white/95 backdrop-blur text-[#012d1d] text-[12px] font-bold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-1">
+                        <Newspaper className="w-4 h-4" /> {item.kategori || 'Info Desa'}
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                    
+                    <div className="p-6 md:p-8 flex-grow flex flex-col">
+                      <div className="flex items-center gap-2 text-[#717973] mb-3">
+                        <Calendar className="w-4 h-4" />
+                        <p className="text-[13px] font-bold uppercase tracking-wider">
+                          {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                      
+                      <h3 className="text-[20px] leading-snug font-extrabold text-[#012d1d] mb-4 line-clamp-2 group-hover:text-[#3f6653] transition-colors">
+                        {item.judul}
+                      </h3>
+                      
+                      <p className="text-[15px] text-[#414844] line-clamp-3 mb-6 leading-relaxed">
+                        {createExcerpt(item.isi_berita)}
+                      </p>
+                      
+                      <div className="mt-auto pt-5 border-t border-[#e4e2de] flex justify-between items-center text-[#012d1d] font-bold text-[14px]">
+                        <span className="group-hover:text-[#3f6653] transition-colors">Baca Artikel</span>
+                        <ArrowRightCircle className="w-5 h-5 transform group-hover:translate-x-2 transition-transform" />
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* 4. PAGINATION (Navigasi Halaman) */}
+              <div className="flex justify-center items-center gap-2">
+                <button className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] transition-colors disabled:opacity-50">
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button className="w-10 h-10 rounded-lg flex items-center justify-center border bg-[#012d1d] text-white font-bold shadow-md">
+                  1
+                </button>
+                <button className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] font-bold transition-colors">
+                  2
+                </button>
+                <button className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] font-bold transition-colors">
+                  3
+                </button>
+                <span className="text-[#717973] font-bold mx-1">...</span>
+                <button className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] transition-colors">
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </>
           ) : (
-            <div className="text-center py-20 text-[#414844] bg-white rounded-2xl border border-[#e4e2de]">
-              Belum ada berita yang dipublikasikan.
-            </div>
-          )}
-
-          {/* Tombol Muat Lebih Banyak */}
-          {beritaLainnya.length > 0 && (
-            <div className="text-center pt-4">
-              <button className="px-6 py-3 border-2 border-[#012d1d] text-[#012d1d] font-bold rounded-xl hover:bg-[#012d1d] hover:text-white transition">
-                Muat Berita Lainnya ⌄
-              </button>
+            <div className="text-center py-24 bg-white rounded-2xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center justify-center">
+               <FileX className="w-16 h-16 text-[#c1c8c2] mb-4" />
+               <h3 className="text-[24px] font-bold text-[#012d1d] mb-2">Pencarian Tidak Ditemukan</h3>
+               <p className="text-[#414844] text-[16px]">Maaf, tidak ada berita dengan filter/judul tersebut.</p>
+               <button 
+                 onClick={() => {setSearchTerm(''); setActiveCategory('Semua');}} 
+                 className="mt-6 bg-[#efeeea] text-[#012d1d] px-6 py-2 rounded-lg font-bold hover:bg-[#e4e2de] transition-colors"
+               >
+                 Tampilkan Semua Berita
+               </button>
             </div>
           )}
 
         </div>
-
-        {/* KOLOM KANAN: PENGUMUMAN & AGENDA (Porsi 1/3) */}
-        <div className="space-y-8">
-          
-          {/* PENGUMUMAN PENTING (Desain Khusus Warna Aksen Merah Muda Terang) */}
-          <div className="bg-[#ffdad6] rounded-2xl shadow-sm border border-[#ffb4ab] p-6">
-            <h3 className="text-[#93000a] text-lg font-bold flex items-center gap-2 mb-5">
-              <span className="text-xl">📢</span> Pengumuman Penting
-            </h3>
-            
-            <div className="space-y-4">
-              <div className="bg-white p-4 rounded-xl shadow-sm flex gap-4 items-start">
-                <div className="bg-[#f5f3ef] p-2.5 rounded-lg text-xl border border-[#e4e2de]">🏥</div>
-                <div>
-                  <h4 className="font-bold text-[#012d1d] text-sm">Jadwal Imunisasi Balita</h4>
-                  <p className="text-xs text-[#414844] mt-1 leading-relaxed">Pelaksanaan Posyandu Mawar 1 untuk bulan ini diundur ke tanggal 20 Agustus 2026.</p>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl shadow-sm flex gap-4 items-start">
-                <div className="bg-[#f5f3ef] p-2.5 rounded-lg text-xl border border-[#e4e2de]">👥</div>
-                <div>
-                  <h4 className="font-bold text-[#012d1d] text-sm">Pengumuman Rapat Desa</h4>
-                  <p className="text-xs text-[#414844] mt-1 leading-relaxed">Mengundang seluruh ketua RT/RW untuk hadir dalam rapat evaluasi pembangunan desa.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* AGENDA BULAN INI */}
-          <div className="bg-white rounded-2xl shadow-sm border border-[#e4e2de] p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-[#012d1d] text-lg font-bold flex items-center gap-2">
-                <span className="text-xl">🗓️</span> Agenda Bulan Ini
-              </h3>
-              <span className="text-xs font-semibold text-[#3f6653] cursor-pointer hover:underline">Lihat Semua</span>
-            </div>
-
-            {/* List Agenda / Timeline */}
-            <div className="space-y-6">
-              
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#012d1d] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-sm">
-                  17
-                </div>
-                <div className="pt-1 border-b border-[#e4e2de] pb-4 w-full">
-                  <h4 className="font-bold text-[#012d1d]">Upacara HUT RI ke-81</h4>
-                  <p className="text-xs text-[#717973] mt-1">07:00 WIB • Lapangan Desa</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#fbf9f5] text-[#012d1d] border-2 border-[#e4e2de] flex items-center justify-center font-bold text-lg shrink-0">
-                  20
-                </div>
-                <div className="pt-1 border-b border-[#e4e2de] pb-4 w-full">
-                  <h4 className="font-bold text-[#012d1d]">Posyandu & Imunisasi</h4>
-                  <p className="text-xs text-[#717973] mt-1">08:00 WIB • Balai Warga RW 03</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#fbf9f5] text-[#012d1d] border-2 border-[#e4e2de] flex items-center justify-center font-bold text-lg shrink-0">
-                  25
-                </div>
-                <div className="pt-1 w-full">
-                  <h4 className="font-bold text-[#012d1d]">Pasar Tani Bulanan</h4>
-                  <p className="text-xs text-[#717973] mt-1">06:00 WIB • Area Parkir Balai Desa</p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+      </section>
     </div>
   );
 }
