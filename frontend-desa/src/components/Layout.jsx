@@ -23,7 +23,7 @@ export default function Layout() {
   };
 
   // Tautan gambar Logo Sugih Mukti Cianjur
-  const logoCianjur = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Lambang_Kabupaten_Cianjur.png/200px-Lambang_Kabupaten_Cianjur.png";
+  const logoCianjur = "/logo-cianjur.png";
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fbf9f5] text-[#1b1c1a] font-['Inter']">

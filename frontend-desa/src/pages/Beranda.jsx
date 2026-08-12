@@ -32,7 +32,7 @@ export default function Beranda() {
         <div className="absolute inset-0 z-0 bg-[#012d1d]/80">
           <img 
             // Gambar sementara representasi kantor instansi, nanti diganti foto balai desa asli dari admin
-            src="https://images.unsplash.com/photo-1577563908411-50cb989766a3?q=80&w=1920&auto=format&fit=crop" 
+            src="https://images.pexels.com/photos/2091157/pexels-photo-2091157.jpeg?auto=compress&cs=tinysrgb&w=1920"
             alt="Depan Kantor Desa Sukawangi" 
             className="w-full h-full object-cover mix-blend-overlay grayscale-[10%]"
           />
