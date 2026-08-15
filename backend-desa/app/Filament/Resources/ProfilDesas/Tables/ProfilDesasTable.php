@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources\ProfilDesas\Tables;
 
+// IMPORT BAWAAN ASLI
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+
+// IMPORT KOLOM
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 
 class ProfilDesasTable
@@ -14,39 +18,40 @@ class ProfilDesasTable
     {
         return $table
             ->columns([
-                TextColumn::make('nama_desa')
-                    ->searchable(),
-                TextColumn::make('total_penduduk')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('luas_wilayah')
-                    ->searchable(),
-                TextColumn::make('jumlah_dusun')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('no_telepon')
-                    ->searchable(),
-                TextColumn::make('email')
-                    ->label('Email address')
-                    ->searchable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                ImageColumn::make('foto_kepala_desa')
+                    ->label('Foto Kades')
+                    ->circular(), // Membuat foto tampil bulat
+                    
                 TextColumn::make('nama_kepala_desa')
+                    ->label('Kepala Desa')
+                    ->searchable()
+                    ->weight('bold'),
+                    
+                TextColumn::make('nama_desa')
+                    ->label('Nama Desa')
                     ->searchable(),
-                TextColumn::make('foto_kepala_desa')
+                    
+                TextColumn::make('total_penduduk')
+                    ->label('Populasi (Jiwa)')
+                    ->numeric()
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
+                    
+                TextColumn::make('luas_wilayah')
+                    ->label('Luas Wilayah (Ha)')
                     ->searchable(),
+                    
+                TextColumn::make('updated_at')
+                    ->label('Terakhir Diperbarui')
+                    ->dateTime('d M Y, H:i')
+                    ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->label('Ubah Profil'), // Memperjelas tombol aksi
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
