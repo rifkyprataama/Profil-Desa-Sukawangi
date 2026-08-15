@@ -13,16 +13,27 @@ use App\Models\Pengaduan;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class PengaduanResource extends Resource
 {
     protected static ?string $model = Pengaduan::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
+    protected static ?string $recordTitleAttribute = 'nama';
+    protected static ?string $navigationLabel = 'Layanan Pengaduan';
+    protected static ?string $pluralModelLabel = 'Pengaduan Warga';
 
-    protected static ?string $recordTitleAttribute = 'judul_laporan';
+    // Badge Notifikasi (Hanya ditulis satu kali)
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('status', 'Menunggu Verifikasi')->count() ?: null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::where('status', 'Menunggu Verifikasi')->count() > 0 ? 'warning' : 'primary';
+    }
 
     public static function form(Schema $schema): Schema
     {

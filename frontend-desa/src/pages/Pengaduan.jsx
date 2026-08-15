@@ -54,24 +54,76 @@ export default function Pengaduan() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulasi pengiriman data
-    setTimeout(() => {
+    // 1. Bungkus data menggunakan FormData karena kita mengirimkan File
+    const submitData = new FormData();
+    
+    // Jika anonim, kosongkan NIK, jika tidak, pakai data aslinya
+    submitData.append('nama', formData.isAnonim ? 'Anonim' : formData.nama);
+    submitData.append('nik', formData.isAnonim ? '' : formData.nik);
+    submitData.append('no_wa', formData.no_wa);
+    submitData.append('kategori', formData.kategori);
+    submitData.append('pesan', formData.pesan);
+    
+    // React mengirim boolean (true/false), Laravel meminta angka (1/0)
+    submitData.append('is_anonim', formData.isAnonim ? 1 : 0);
+    
+    // Masukkan file jika ada
+    if (formData.lampiran) {
+      submitData.append('lampiran', formData.lampiran);
+    }
+
+    // 2. Kirim data ke API Laravel (DENGAN TAMBAHAN HEADERS)
+    fetch('http://localhost:8000/api/pengaduan', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json' // INI KUNCI UTAMANYA
+      },
+      body: submitData, 
+    })
+    .then(async (response) => {
+      // Kita tangkap error dari Laravel jika ada data yang tidak sesuai
+      const data = await response.json();
+      if (!response.ok) {
+        throw data; // Lempar error ke blok catch di bawah
+      }
+      return data;
+    })
+    .then((res) => {
       setIsSubmitting(false);
-      toast.success('Pengaduan berhasil dikirim! Terima kasih atas partisipasi Anda.', {
-        description: 'Tindak lanjut akan diinformasikan melalui nomor WhatsApp yang Anda cantumkan.'
-      });
-      // Reset form
-      setFormData({
-        nama: '',
-        nik: '',
-        no_wa: '',
-        kategori: 'Infrastruktur & Lingkungan',
-        pesan: '',
-        isAnonim: false,
-        lampiran: null
-      });
-      setPreviewName('');
-    }, 1500);
+      
+      if (res.status === 'success') {
+        toast.success('Pengaduan berhasil dikirim! Terima kasih atas partisipasi Anda.', {
+          description: 'Tindak lanjut akan diinformasikan melalui nomor WhatsApp yang Anda cantumkan.'
+        });
+        
+        // Reset form ke kondisi kosong setelah berhasil
+        setFormData({
+          nama: '',
+          nik: '',
+          no_wa: '',
+          kategori: 'Infrastruktur & Lingkungan',
+          pesan: '',
+          isAnonim: false,
+          lampiran: null
+        });
+        setPreviewName('');
+      } else {
+        toast.error('Gagal mengirim laporan. Pastikan data terisi dengan benar.');
+      }
+    })
+    .catch((error) => {
+      setIsSubmitting(false);
+      console.error("Detail Error dari Laravel:", error); // Cek console inspect element jika masih gagal
+      
+      // Menampilkan pesan error validasi spesifik dari Laravel jika ada
+      if (error.errors) {
+        toast.error('Data tidak valid!', {
+          description: 'Pastikan Nomor WhatsApp dan semua kolom wajib sudah terisi.'
+        });
+      } else {
+        toast.error('Terjadi kesalahan jaringan atau server. Silakan coba lagi nanti.');
+      }
+    });
   };
 
   return (

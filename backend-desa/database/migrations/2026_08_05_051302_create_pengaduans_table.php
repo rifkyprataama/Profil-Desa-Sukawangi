@@ -10,12 +10,17 @@ return new class extends Migration
     {
         Schema::create('pengaduans', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_pelapor');
-            $table->string('nik', 16)->nullable();
-            $table->string('judul_laporan');
-            $table->text('isi_laporan');
-            $table->string('foto_bukti')->nullable();
-            $table->enum('status', ['menunggu', 'diproses', 'selesai'])->default('menunggu');
+            $table->string('nama')->nullable(); // Menyesuaikan dengan React
+            $table->string('nik', 16)->nullable(); 
+            $table->string('no_wa'); // Tambahan nomor WhatsApp
+            $table->string('kategori'); // Tambahan kategori laporan
+            $table->text('pesan'); // Mengganti isi_laporan menjadi pesan
+            $table->boolean('is_anonim')->default(false); // Menampung status anonim
+            $table->string('lampiran')->nullable(); // Mengganti foto_bukti menjadi lampiran
+            
+            // Menggunakan string biasa agar lebih fleksibel di Filament
+            $table->string('status')->default('Menunggu Verifikasi'); 
+            
             $table->timestamps();
         });
     }

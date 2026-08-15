@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\ProfilDesas\Pages;
+namespace App\Filament\Resources\PengaturanBerandas\Pages;
 
-use App\Filament\Resources\ProfilDesas\ProfilDesaResource;
+use App\Filament\Resources\PengaturanBerandas\PengaturanBerandaResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditProfilDesa extends EditRecord
+class EditPengaturanBeranda extends EditRecord
 {
-    protected static string $resource = ProfilDesaResource::class;
+    protected static string $resource = PengaturanBerandaResource::class;
 
     protected function getHeaderActions(): array
     {

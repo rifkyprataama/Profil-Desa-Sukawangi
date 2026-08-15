@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources\Pengaduans\Tables;
 
+// IMPORT BAWAAN ASLI ANDA:
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+
+// IMPORT KOLOM BARU:
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 
 class PengaduansTable
@@ -15,36 +19,56 @@ class PengaduansTable
     {
         return $table
             ->columns([
-                TextColumn::make('nama_pelapor')
-                    ->searchable(),
-                TextColumn::make('nik')
-                    ->searchable(),
-                TextColumn::make('judul_laporan')
-                    ->searchable(),
-                TextColumn::make('foto_bukti')
-                    ->searchable(),
+                TextColumn::make('nama')
+                    ->label('Nama Pelapor')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
+                    
+                TextColumn::make('kategori')
+                    ->label('Kategori')
+                    ->searchable()
+                    ->badge()
+                    ->color('gray'),
+                    
+                TextColumn::make('no_wa')
+                    ->label('No. WhatsApp')
+                    ->searchable()
+                    ->icon('heroicon-m-phone'),
+
+                ImageColumn::make('lampiran')
+                    ->label('Bukti')
+                    ->square(),
+                    
                 TextColumn::make('status')
-                    ->badge(),
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Menunggu Verifikasi' => 'warning',
+                        'Sedang Diproses' => 'info',
+                        'Selesai' => 'success',
+                        'Ditolak' => 'danger',
+                        default => 'gray',
+                    }),
+                    
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dilaporkan pada')
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
                 //
             ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+            ->recordActions([ // Kembali menggunakan recordActions
+                ViewAction::make()->label('Lihat'),
+                EditAction::make()->label('Ubah Status'),
             ])
-            ->toolbarActions([
+            ->toolbarActions([ // Kembali menggunakan toolbarActions
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 }

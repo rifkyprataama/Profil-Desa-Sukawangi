@@ -6,13 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pengaduan extends Model
 {
-    // Mengizinkan kolom-kolom ini diisi dari form (Mass Assignment)
-    protected $fillable = [
-        'nama_pelapor',
-        'nik',
-        'judul_laporan',
-        'isi_laporan',
-        'foto_bukti',
-        'status'
-    ];
+    // Mengizinkan semua kolom diisi dari form React
+    protected $guarded = [];
 }

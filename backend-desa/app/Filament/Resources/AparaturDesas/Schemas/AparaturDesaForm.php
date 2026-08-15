@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\AparaturDesas\Schemas;
 
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Schema;
 
 class AparaturDesaForm
@@ -12,11 +13,22 @@ class AparaturDesaForm
         return $schema
             ->components([
                 TextInput::make('nama_lengkap')
-                    ->required(),
+                    ->label('Nama Lengkap (beserta gelar)')
+                    ->required()
+                    ->maxLength(255),
                 TextInput::make('jabatan')
-                    ->required(),
-                TextInput::make('periode_jabatan'),
-                TextInput::make('foto'),
+                    ->label('Jabatan (Contoh: Sekretaris Desa, Kaur Keuangan, Ketua BPD)')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('periode_jabatan')
+                    ->label('Periode Jabatan (Opsional, misal: 2022 - 2028)')
+                    ->maxLength(255),
+                FileUpload::make('foto')
+                    ->label('Foto Aparatur')
+                    ->image()
+                    ->directory('aparatur')
+                    ->disk('public') // <--- TAMBAHKAN BARIS INI
+                    ->columnSpanFull(),
             ]);
     }
 }

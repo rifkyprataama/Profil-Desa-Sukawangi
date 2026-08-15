@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ProfilDesaController;
 use App\Http\Controllers\Api\AparaturDesaController;
 use App\Http\Controllers\Api\PengaduanController;
 use App\Http\Controllers\Api\GaleriController;
+use App\Http\Controllers\PengaturanBerandaController; // <-- Tambahan Import Controller Beranda
 
 
 // =================================================================
@@ -24,6 +25,9 @@ Route::apiResource('galeri', GaleriController::class)->only(['index', 'show']);
 
 // Khusus Profil Desa, karena hanya 1 baris data, kita cukup gunakan rute GET tunggal
 Route::get('/profil-desa', [ProfilDesaController::class, 'index']);
+
+// Khusus Pengaturan Beranda (Ditambahkan tepat di bawah Profil Desa)
+Route::get('/pengaturan-beranda', [PengaturanBerandaController::class, 'index']);
 
 // Khusus pengaduan, warga bisa MELIHAT dan MENGIRIM aduan (store)
 Route::apiResource('pengaduan', PengaduanController::class)->only(['index', 'show', 'store']);

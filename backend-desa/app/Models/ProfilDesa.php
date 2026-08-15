@@ -9,11 +9,11 @@ class ProfilDesa extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'nama_kepala_desa',
-        'foto_kepala_desa',
-        'sambutan',
-        'visi',
-        'misi',
+    // 1. Mengganti $fillable menjadi $guarded agar semua kolom diizinkan masuk
+    protected $guarded = [];
+
+    // 2. Memberikan nilai otomatis untuk kolom yang kosong dari form
+    protected $attributes = [
+        'nama_desa' => 'Sukawangi',
     ];
 }

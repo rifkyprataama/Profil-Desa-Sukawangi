@@ -5,61 +5,69 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Pengaduan;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class PengaduanController extends Controller
 {
+    // Fungsi untuk mengambil semua data (jika diperlukan nanti)
     public function index()
     {
         $pengaduan = Pengaduan::latest()->get();
-        return response()->json(['success' => true, 'data' => $pengaduan], 200);
+        return response()->json([
+            'success' => true,
+            'data' => $pengaduan
+        ]);
     }
 
+    // FUNGSI INTI UNTUK MENERIMA DATA DARI REACT
     public function store(Request $request)
     {
-        $data = $request->all();
+        // 1. Aturan Validasi (Harus sama persis dengan yang dikirim React)
+        $validated = $request->validate([
+            'nama' => 'nullable|string|max:255',
+            'nik' => 'nullable|string|max:16',
+            'no_wa' => 'required|string|max:20',
+            'kategori' => 'required|string|max:255',
+            'pesan' => 'required|string',
+            'is_anonim' => 'required|boolean',
+            'lampiran' => 'nullable|file|max:5120',
+        ]);
 
-        if ($request->hasFile('foto_bukti')) {
-            $path = $request->file('foto_bukti')->store('pengaduan', 'public');
-            $data['foto_bukti'] = $path;
+        // 2. Modifikasi Data jika Anonim
+        if ($validated['is_anonim']) {
+            $validated['nama'] = 'Anonim (Rahasia)';
+            $validated['nik'] = '-';
         }
 
-        $pengaduan = Pengaduan::create($data);
-        return response()->json(['success' => true, 'message' => 'Pengaduan dikirim', 'data' => $pengaduan], 201);
+        // 3. Proses File Gambar/Dokumen (Jika ada)
+        if ($request->hasFile('lampiran')) {
+            $validated['lampiran'] = $request->file('lampiran')->store('pengaduan', 'public');
+        }
+
+        // 4. Set Status Awal
+        $validated['status'] = 'Menunggu Verifikasi';
+
+        // 5. Simpan ke Database
+        Pengaduan::create($validated);
+
+        // 6. Kirim Jawaban ke React bahwa berhasil
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Laporan berhasil dikirim'
+        ]);
     }
 
     public function show($id)
     {
         $pengaduan = Pengaduan::find($id);
-        return response()->json(['success' => true, 'data' => $pengaduan], 200);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $pengaduan = Pengaduan::find($id);
-        $data = $request->all();
-
-        if ($request->hasFile('foto_bukti')) {
-            if ($pengaduan->foto_bukti) {
-                Storage::disk('public')->delete($pengaduan->foto_bukti);
-            }
-            $path = $request->file('foto_bukti')->store('pengaduan', 'public');
-            $data['foto_bukti'] = $path;
+        if ($pengaduan) {
+            return response()->json([
+                'success' => true,
+                'data' => $pengaduan
+            ]);
         }
-
-        $pengaduan->update($data);
-        return response()->json(['success' => true, 'message' => 'Status diperbarui', 'data' => $pengaduan], 200);
-    }
-
-    public function destroy($id)
-    {
-        $pengaduan = Pengaduan::find($id);
-        
-        if ($pengaduan->foto_bukti) {
-            Storage::disk('public')->delete($pengaduan->foto_bukti);
-        }
-        
-        $pengaduan->delete();
-        return response()->json(['success' => true, 'message' => 'Pengaduan dihapus'], 200);
+        return response()->json([
+            'success' => false,
+            'message' => 'Data tidak ditemukan'
+        ], 404);
     }
 }
