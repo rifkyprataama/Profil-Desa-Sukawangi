@@ -18,7 +18,7 @@ class PengaturanBerandaResource extends Resource
 {
     protected static ?string $model = PengaturanBeranda::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHome;
 
     public static function form(Schema $schema): Schema
     {

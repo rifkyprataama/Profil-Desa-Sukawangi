@@ -9,6 +9,9 @@ import { toast } from 'sonner';
 
 export default function Kontak() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dataKontak, setDataKontak] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [formData, setFormData] = useState({
     nama: '',
     email: '',
@@ -16,9 +19,25 @@ export default function Kontak() {
     pesan: ''
   });
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+
+    // MENGAMBIL DATA KONTAK DARI API
+    fetch(`${API_URL}/api/kontak`)
+      .then(response => response.json())
+      .then(res => {
+        if (res.success && res.data) {
+          setDataKontak(res.data);
+        }
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching kontak:', error);
+        setLoading(false);
+      });
+  }, [API_URL]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,6 +47,7 @@ export default function Kontak() {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Simulasi pengiriman pesan (Bisa dihubungkan ke backend nanti)
     setTimeout(() => {
       setIsSubmitting(false);
       toast.success('Pesan Terkirim!', {
@@ -73,7 +93,6 @@ export default function Kontak() {
           <div className="inline-flex items-center gap-2 bg-[#febe9b] text-[#331200] px-4 py-1.5 rounded-full text-[13px] font-bold uppercase tracking-widest mb-6 shadow-sm">
             <Phone className="w-4 h-4" /> Hubungi Kami
           </div>
-          {/* REVISI: Perubahan Judul Hero Banner */}
           <h1 className="text-[36px] md:text-[52px] font-extrabold text-white leading-tight drop-shadow-md">
             Kontak Pelayanan Desa
           </h1>
@@ -92,46 +111,58 @@ export default function Kontak() {
       {/* 3. KARTU INFORMASI UTAMA */}
       <section className="py-16 bg-[#fbf9f5]">
         <div className="max-w-[1200px] mx-auto px-6">
-          
           <div className="text-center mb-12">
-            {/* REVISI: Perubahan Judul Sub-Seksi */}
             <h2 className="text-[28px] md:text-[32px] font-bold text-[#012d1d] mb-3">Pusat Informasi Pelayanan</h2>
             <p className="text-[16px] text-[#414844]">Silakan hubungi atau kunjungi kami pada jam operasional kerja.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white p-8 rounded-2xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center text-center group hover:shadow-md transition-all">
-              <div className="w-16 h-16 bg-[#febe9b]/30 rounded-full flex items-center justify-center text-[#835336] mb-5 group-hover:scale-110 transition-transform">
-                <MapPin className="w-7 h-7" />
-              </div>
-              <h3 className="text-[18px] font-bold text-[#012d1d] mb-2">Alamat Balai Desa</h3>
-              <p className="text-[14px] text-[#717973] leading-relaxed">Jl. Desa Sukawangi No. 1, Kec. Warungkondang, Kab. Cianjur, Jawa Barat</p>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
+              {[1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-[#e4e2de] rounded-2xl"></div>)}
             </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white p-8 rounded-2xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center text-center group hover:shadow-md transition-all">
+                <div className="w-16 h-16 bg-[#febe9b]/30 rounded-full flex items-center justify-center text-[#835336] mb-5 group-hover:scale-110 transition-transform">
+                  <MapPin className="w-7 h-7" />
+                </div>
+                <h3 className="text-[18px] font-bold text-[#012d1d] mb-2">Alamat Balai Desa</h3>
+                <p className="text-[14px] text-[#717973] leading-relaxed">
+                  {dataKontak?.alamat || 'Belum diatur'}
+                </p>
+              </div>
 
-            <div className="bg-white p-8 rounded-2xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center text-center group hover:shadow-md transition-all">
-              <div className="w-16 h-16 bg-[#cde5ff] rounded-full flex items-center justify-center text-[#003f63] mb-5 group-hover:scale-110 transition-transform">
-                <Phone className="w-7 h-7" />
+              <div className="bg-white p-8 rounded-2xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center text-center group hover:shadow-md transition-all">
+                <div className="w-16 h-16 bg-[#cde5ff] rounded-full flex items-center justify-center text-[#003f63] mb-5 group-hover:scale-110 transition-transform">
+                  <Phone className="w-7 h-7" />
+                </div>
+                <h3 className="text-[18px] font-bold text-[#012d1d] mb-2">Telepon / WhatsApp</h3>
+                <p className="text-[14px] text-[#717973] leading-relaxed">
+                  {dataKontak?.telepon || 'Belum diatur'}
+                </p>
               </div>
-              <h3 className="text-[18px] font-bold text-[#012d1d] mb-2">Telepon / WhatsApp</h3>
-              <p className="text-[14px] text-[#717973] leading-relaxed">+62 812-3456-7890<br/>(Hanya menerima pesan WA)</p>
-            </div>
 
-            <div className="bg-white p-8 rounded-2xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center text-center group hover:shadow-md transition-all">
-              <div className="w-16 h-16 bg-[#012d1d]/10 rounded-full flex items-center justify-center text-[#012d1d] mb-5 group-hover:scale-110 transition-transform">
-                <Mail className="w-7 h-7" />
+              <div className="bg-white p-8 rounded-2xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center text-center group hover:shadow-md transition-all">
+                <div className="w-16 h-16 bg-[#012d1d]/10 rounded-full flex items-center justify-center text-[#012d1d] mb-5 group-hover:scale-110 transition-transform">
+                  <Mail className="w-7 h-7" />
+                </div>
+                <h3 className="text-[18px] font-bold text-[#012d1d] mb-2">Email Resmi</h3>
+                <p className="text-[14px] text-[#717973] leading-relaxed break-all">
+                  {dataKontak?.email || 'Belum diatur'}
+                </p>
               </div>
-              <h3 className="text-[18px] font-bold text-[#012d1d] mb-2">Email Resmi</h3>
-              <p className="text-[14px] text-[#717973] leading-relaxed">pemdes@sukawangi.desa.id<br/>info.sukawangi@gmail.com</p>
-            </div>
 
-            <div className="bg-white p-8 rounded-2xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center text-center group hover:shadow-md transition-all">
-              <div className="w-16 h-16 bg-[#e4e2de] rounded-full flex items-center justify-center text-[#414844] mb-5 group-hover:scale-110 transition-transform">
-                <Clock className="w-7 h-7" />
+              <div className="bg-white p-8 rounded-2xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center text-center group hover:shadow-md transition-all">
+                <div className="w-16 h-16 bg-[#e4e2de] rounded-full flex items-center justify-center text-[#414844] mb-5 group-hover:scale-110 transition-transform">
+                  <Clock className="w-7 h-7" />
+                </div>
+                <h3 className="text-[18px] font-bold text-[#012d1d] mb-2">Jam Operasional</h3>
+                <p className="text-[14px] text-[#717973] leading-relaxed">
+                  {dataKontak?.jam_operasional || 'Belum diatur'}
+                </p>
               </div>
-              <h3 className="text-[18px] font-bold text-[#012d1d] mb-2">Jam Operasional</h3>
-              <p className="text-[14px] text-[#717973] leading-relaxed">Senin - Jumat: 08.00 - 15.00<br/>Sabtu, Minggu & Libur Nasional: Tutup</p>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -140,7 +171,6 @@ export default function Kontak() {
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="flex flex-col lg:flex-row gap-12">
             
-            {/* Kiri: Formulir Pertanyaan Umum */}
             <div className="lg:w-5/12 w-full bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-[#c1c8c2]/40">
               <div className="flex items-center gap-3 mb-6 border-b border-[#e4e2de] pb-6">
                 <MessageSquare className="w-8 h-8 text-[#835336]" />
@@ -153,81 +183,36 @@ export default function Kontak() {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="block text-[14px] font-bold text-[#012d1d] mb-2">Nama Lengkap</label>
-                  <input 
-                    type="text" 
-                    name="nama"
-                    value={formData.nama}
-                    onChange={handleChange}
-                    required
-                    placeholder="Nama Anda"
-                    className="w-full bg-[#fbf9f5] border border-[#c1c8c2] text-[#1b1c1a] text-[15px] rounded-xl focus:ring-[#012d1d] focus:border-[#012d1d] block p-3.5 transition-colors"
-                  />
+                  <input type="text" name="nama" value={formData.nama} onChange={handleChange} required placeholder="Nama Anda" className="w-full bg-[#fbf9f5] border border-[#c1c8c2] text-[#1b1c1a] text-[15px] rounded-xl focus:ring-[#012d1d] focus:border-[#012d1d] block p-3.5 transition-colors" />
                 </div>
                 <div>
                   <label className="block text-[14px] font-bold text-[#012d1d] mb-2">Email atau No. WhatsApp</label>
-                  <input 
-                    type="text" 
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    placeholder="Untuk balasan dari kami"
-                    className="w-full bg-[#fbf9f5] border border-[#c1c8c2] text-[#1b1c1a] text-[15px] rounded-xl focus:ring-[#012d1d] focus:border-[#012d1d] block p-3.5 transition-colors"
-                  />
+                  <input type="text" name="email" value={formData.email} onChange={handleChange} required placeholder="Untuk balasan dari kami" className="w-full bg-[#fbf9f5] border border-[#c1c8c2] text-[#1b1c1a] text-[15px] rounded-xl focus:ring-[#012d1d] focus:border-[#012d1d] block p-3.5 transition-colors" />
                 </div>
                 <div>
                   <label className="block text-[14px] font-bold text-[#012d1d] mb-2">Subjek / Keperluan</label>
-                  <input 
-                    type="text" 
-                    name="subjek"
-                    value={formData.subjek}
-                    onChange={handleChange}
-                    required
-                    placeholder="Misal: Info Syarat KTP"
-                    className="w-full bg-[#fbf9f5] border border-[#c1c8c2] text-[#1b1c1a] text-[15px] rounded-xl focus:ring-[#012d1d] focus:border-[#012d1d] block p-3.5 transition-colors"
-                  />
+                  <input type="text" name="subjek" value={formData.subjek} onChange={handleChange} required placeholder="Misal: Info Syarat KTP" className="w-full bg-[#fbf9f5] border border-[#c1c8c2] text-[#1b1c1a] text-[15px] rounded-xl focus:ring-[#012d1d] focus:border-[#012d1d] block p-3.5 transition-colors" />
                 </div>
                 <div>
                   <label className="block text-[14px] font-bold text-[#012d1d] mb-2">Pesan Anda</label>
-                  <textarea 
-                    name="pesan"
-                    value={formData.pesan}
-                    onChange={handleChange}
-                    required
-                    rows="4"
-                    placeholder="Tuliskan pertanyaan Anda di sini..."
-                    className="w-full bg-[#fbf9f5] border border-[#c1c8c2] text-[#1b1c1a] text-[15px] rounded-xl focus:ring-[#012d1d] focus:border-[#012d1d] block p-3.5 transition-colors resize-none"
-                  ></textarea>
+                  <textarea name="pesan" value={formData.pesan} onChange={handleChange} required rows="4" placeholder="Tuliskan pertanyaan Anda di sini..." className="w-full bg-[#fbf9f5] border border-[#c1c8c2] text-[#1b1c1a] text-[15px] rounded-xl focus:ring-[#012d1d] focus:border-[#012d1d] block p-3.5 transition-colors resize-none"></textarea>
                 </div>
-                <button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full inline-flex items-center justify-center gap-2 bg-[#012d1d] text-white px-8 py-4 rounded-xl text-[16px] font-bold hover:bg-[#1b4332] focus:ring-4 focus:ring-[#012d1d]/30 transition-all shadow-md active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
-                >
+                <button type="submit" disabled={isSubmitting} className="w-full inline-flex items-center justify-center gap-2 bg-[#012d1d] text-white px-8 py-4 rounded-xl text-[16px] font-bold hover:bg-[#1b4332] focus:ring-4 focus:ring-[#012d1d]/30 transition-all shadow-md active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed mt-2">
                   {isSubmitting ? 'Mengirim...' : <><Send className="w-5 h-5" /> Kirim Pesan Sekarang</>}
                 </button>
               </form>
             </div>
 
-            {/* Kanan: Peta Google Maps Interaktif */}
             <div className="lg:w-7/12 w-full flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm border border-[#c1c8c2]/40 relative min-h-[400px]">
               <div className="bg-[#1b4332] text-white p-6 flex flex-wrap items-center justify-between gap-4 z-10 relative shadow-sm">
                 <div className="flex items-center gap-3">
                   <Map className="w-6 h-6 text-[#febe9b]" />
                   <h2 className="text-[18px] font-bold">Peta Titik Lokasi Balai Desa</h2>
                 </div>
-                <a 
-                  href="https://maps.google.com" 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="text-[13px] font-bold bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded-full transition-colors whitespace-nowrap"
-                >
-                  Buka di Maps
-                </a>
               </div>
               <div className="flex-grow w-full bg-[#e4e2de] relative z-0 h-[350px] lg:h-auto">
                 <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126748.56347862248!2d107.55833611394142!3d-7.147779772658826!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68b63981881729%3A0x401e8f1fc28c890!2sSukawangi%2C%20Warungkondang%2C%20Cianjur%20Regency%2C%20West%20Java!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid" 
+                  src={dataKontak?.link_peta || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126748.56347862248!2d107.55833611394142!3d-7.147779772658826!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68b63981881729%3A0x401e8f1fc28c890!2sSukawangi%2C%20Warungkondang%2C%20Cianjur%20Regency%2C%20West%20Java!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"} 
                   width="100%" 
                   height="100%" 
                   style={{ border: 0 }} 
