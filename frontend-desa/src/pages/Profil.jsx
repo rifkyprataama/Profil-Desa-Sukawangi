@@ -8,6 +8,7 @@ import {
 
 export default function Profil() {
   const [profilDesa, setProfilDesa] = useState(null);
+  const [aparaturDesa, setAparaturDesa] = useState([]); // TAMBAHAN: State untuk aparatur
   const [loading, setLoading] = useState(true);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -15,16 +16,25 @@ export default function Profil() {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    fetch(`${API_URL}/api/profil-desa`)
-      .then(response => response.json())
-      .then(res => {
-        setProfilDesa(res.data || res);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error Profil:', error);
-        setLoading(false);
-      });
+    // TAMBAHAN: Mengambil data Profil dan Aparatur secara bersamaan
+    Promise.all([
+      fetch(`${API_URL}/api/profil-desa`).then(res => res.json()),
+      fetch(`${API_URL}/api/aparatur`).then(res => res.json())
+    ])
+    .then(([resProfil, resAparatur]) => {
+      setProfilDesa(resProfil.data || resProfil);
+      
+      // Memasukkan data aparatur jika berhasil diambil
+      if (resAparatur.success) {
+        setAparaturDesa(resAparatur.data);
+      }
+      
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+      setLoading(false);
+    });
   }, [API_URL]);
 
   const scrollToSection = (id) => {
@@ -223,19 +233,18 @@ export default function Profil() {
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-                {/* 
-                  Perbaikan Sementara: Memanggil Foto Kepala Desa dari Backend.
-                  (Nanti sisa aparatur lain akan kita panggil dari API AparaturDesa)
-                */}
+                {/* TAMBAHAN: Menggabungkan Kepala Desa dan maksimal 3 Aparatur secara dinamis */}
                 {[
                   { 
                     nama: profilDesa?.nama_kepala_desa || 'Belum Diisi', 
                     jabatan: 'Kepala Desa', 
                     foto: profilDesa?.foto_kepala_desa ? `${API_URL}/storage/${profilDesa.foto_kepala_desa}` : null 
                   },
-                  { nama: 'Budi Santoso, S.IP', jabatan: 'Sekretaris Desa', foto: null },
-                  { nama: 'Siti Aminah, S.E', jabatan: 'Kaur Keuangan', foto: null },
-                  { nama: 'Ridwan Kamil, S.Ag', jabatan: 'Kasi Pemerintahan', foto: null },
+                  ...aparaturDesa.slice(0, 3).map(aparatur => ({
+                    nama: aparatur.nama_lengkap,
+                    jabatan: aparatur.jabatan,
+                    foto: aparatur.foto ? `${API_URL}/storage/${aparatur.foto}` : null
+                  }))
                 ].map((pejabat, idx) => (
                   <div key={idx} className="bg-white border border-[#c1c8c2]/40 rounded-2xl p-6 flex flex-col items-center text-center shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer">
                     <div className="w-24 h-24 bg-[#e4e2de] rounded-full mb-5 overflow-hidden border-[3px] border-[#efeeea] group-hover:border-[#012d1d] transition-colors shadow-sm relative">
@@ -285,7 +294,6 @@ export default function Profil() {
 
           {/* 7. BOTTOM CTA */}
           <section className="py-16 bg-white border-t border-[#c1c8c2]/30">
-            {/* CTA Section Tetap Sama */}
             <div className="max-w-[1200px] mx-auto px-6 text-center flex flex-col items-center">
               <h2 className="text-[24px] font-bold text-[#012d1d] mb-3">Butuh Bantuan atau Informasi Lebih Lanjut?</h2>
               <div className="flex flex-wrap justify-center gap-4">

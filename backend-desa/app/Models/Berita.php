@@ -11,7 +11,8 @@ class Berita extends Model
 
     protected $fillable = [
         'judul',
-        'slug',      // <-- Pastikan slug ada di sini
+        'slug',
+        'kategori', // <-- Tambahan kolom kategori
         'isi_berita',
         'gambar',
     ];

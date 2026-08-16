@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::create('beritas', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
-            $table->string('slug')->unique();
-            $table->text('isi_konten');
-            $table->string('thumbnail')->nullable();
-            $table->enum('status', ['publik', 'draf'])->default('publik');
+            $table->string('slug');
+            $table->string('kategori'); // <-- Pastikan baris ini ada
+            $table->longText('isi_berita');
+            $table->string('gambar')->nullable();
             $table->timestamps();
         });
     }

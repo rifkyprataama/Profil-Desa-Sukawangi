@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 
 class GalerisTable
@@ -14,29 +15,44 @@ class GalerisTable
     {
         return $table
             ->columns([
+                ImageColumn::make('file_gambar')
+                    ->label('Thumbnail')
+                    ->square(),
+                    
                 TextColumn::make('judul_kegiatan')
+                    ->label('Judul Dokumentasi')
+                    ->searchable()
+                    ->weight('bold'),
+                    
+                TextColumn::make('kategori')
+                    ->label('Kategori')
+                    ->badge()
+                    ->color('success')
                     ->searchable(),
-                TextColumn::make('file_gambar')
-                    ->searchable(),
+                    
+                TextColumn::make('tipe')
+                    ->label('Format')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'video' => 'danger',
+                        'foto' => 'info',
+                    })
+                    ->formatStateUsing(fn (string $state): string => strtoupper($state)),
+                    
                 TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Diupload')
+                    ->dateTime('d M Y')
+                    ->sortable(),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->label('Ubah'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 }

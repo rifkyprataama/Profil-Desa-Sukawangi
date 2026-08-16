@@ -10,31 +10,53 @@ export default function Galeri() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('Semua');
   const [selectedItem, setSelectedItem] = useState(null);
-
-  // DATA DUMMY GALERI (Sekarang mendukung Foto dan Video)
-  const dummyGallery = [
-    { id: 1, tipe: 'foto', judul: 'Perbaikan Jalan Dusun II', kategori: 'Infrastruktur', url: 'https://images.unsplash.com/photo-1584351583369-6baf055b51a7?q=80&w=800&auto=format&fit=crop' },
-    { id: 2, tipe: 'video', judul: 'Dokumenter: Potensi Pertanian Desa', kategori: 'Kegiatan Warga', url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop', videoId: 'kJQP7kiw5Fk' }, // Contoh ID YouTube
-    { id: 3, tipe: 'foto', judul: 'Rapat Desa Bulanan', kategori: 'Pemerintahan', url: 'https://images.unsplash.com/photo-1577563908411-50cb989766a3?q=80&w=800&auto=format&fit=crop' },
-    { id: 4, tipe: 'foto', judul: 'Penyaluran Bantuan Sosial', kategori: 'Sosial', url: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop' },
-    { id: 5, tipe: 'video', judul: 'Liputan Posyandu Melati', kategori: 'Kesehatan', url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=800&auto=format&fit=crop', videoId: 'EngW7tLk6R8' },
-    { id: 6, tipe: 'foto', judul: 'Pembangunan Jembatan Gantung', kategori: 'Infrastruktur', url: 'https://images.unsplash.com/photo-1541888086225-ee81fb60195a?q=80&w=800&auto=format&fit=crop' },
-    { id: 7, tipe: 'foto', judul: 'Kerja Bakti Bersih Desa', kategori: 'Kegiatan Warga', url: 'https://images.unsplash.com/photo-1593409951662-8e7c10b067d3?q=80&w=800&auto=format&fit=crop' },
-    { id: 8, tipe: 'foto', judul: 'Kunjungan Bupati ke Balai Desa', kategori: 'Pemerintahan', url: 'https://images.unsplash.com/photo-1555848962-6e79363ec58f?q=80&w=800&auto=format&fit=crop' },
-  ];
+  
+  const [dataGaleri, setDataGaleri] = useState([]);
+  
+  // TAMBAHAN: State untuk membatasi jumlah item yang tampil (Mulai dari 8)
+  const [visibleCount, setVisibleCount] = useState(8);
 
   const categories = ['Semua', 'Infrastruktur', 'Pemerintahan', 'Kegiatan Warga', 'Sosial', 'Kesehatan'];
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
   useEffect(() => {
     window.scrollTo(0, 0);
-    setTimeout(() => {
-      setLoading(false);
-    }, 800);
-  }, []);
+    
+    fetch(`${API_URL}/api/galeri`)
+      .then(response => response.json())
+      .then(res => {
+        const d = res.data?.data || res.data || res;
+        if (Array.isArray(d)) {
+          const formattedData = d.map(item => ({
+            id: item.id,
+            tipe: item.tipe || 'foto',
+            judul: item.judul_kegiatan,
+            kategori: item.kategori,
+            url: `${API_URL}/storage/${item.file_gambar}`,
+            videoId: item.link_video
+          }));
+          setDataGaleri(formattedData);
+        }
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching galeri:', error);
+        setLoading(false);
+      });
+  }, [API_URL]);
 
-  const filteredGallery = dummyGallery.filter(item => 
+  // Reset jumlah yang tampil ke 8 setiap kali kategori diubah
+  useEffect(() => {
+    setVisibleCount(8);
+  }, [activeCategory]);
+
+  const filteredGallery = dataGaleri.filter(item => 
     activeCategory === 'Semua' || item.kategori === activeCategory
   );
+
+  // TAMBAHAN: Hanya memotong array data sesuai dengan `visibleCount`
+  const displayedGallery = filteredGallery.slice(0, visibleCount);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -103,10 +125,11 @@ export default function Galeri() {
                 <div key={item} className="h-64 bg-[#e4e2de] rounded-2xl animate-pulse"></div>
               ))}
             </div>
-          ) : filteredGallery.length > 0 ? (
+          ) : displayedGallery.length > 0 ? (
             <>
+              {/* Gunakan displayedGallery di sini */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {filteredGallery.map((item) => (
+                {displayedGallery.map((item) => (
                   <div 
                     key={item.id} 
                     onClick={() => setSelectedItem(item)}
@@ -119,7 +142,6 @@ export default function Galeri() {
                       loading="lazy"
                     />
                     
-                    {/* Indikator Jika Konten adalah Video */}
                     {item.tipe === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                         <PlayCircle className="w-14 h-14 text-white/90 drop-shadow-lg group-hover:scale-110 transition-transform" />
@@ -144,10 +166,13 @@ export default function Galeri() {
                 ))}
               </div>
 
-              {/* Fitur Load More */}
-              {filteredGallery.length >= 8 && (
+              {/* FITUR LOAD MORE AKTIF */}
+              {visibleCount < filteredGallery.length && (
                 <div className="mt-12 text-center">
-                  <button className="inline-flex items-center justify-center gap-2 bg-white text-[15px] font-bold border-2 border-[#e4e2de] text-[#012d1d] px-8 py-3.5 rounded-lg hover:bg-[#efeeea] hover:border-[#c1c8c2] transition-all shadow-sm group">
+                  <button 
+                    onClick={() => setVisibleCount(prev => prev + 8)}
+                    className="inline-flex items-center justify-center gap-2 bg-white text-[15px] font-bold border-2 border-[#e4e2de] text-[#012d1d] px-8 py-3.5 rounded-lg hover:bg-[#efeeea] hover:border-[#c1c8c2] transition-all shadow-sm group"
+                  >
                     Muat Lebih Banyak <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
                   </button>
                 </div>
@@ -187,7 +212,7 @@ export default function Galeri() {
         </div>
       </section>
 
-      {/* 5. LIGHTBOX MODAL (Dinamis: Bisa Foto atau Video) */}
+      {/* 5. LIGHTBOX MODAL */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <button 
@@ -198,8 +223,6 @@ export default function Galeri() {
           </button>
 
           <div className="relative max-w-5xl w-full flex flex-col items-center z-10 pointer-events-none">
-            
-            {/* Logic Rendering: Jika Video Tampilkan Iframe, Jika Foto Tampilkan Image */}
             {selectedItem.tipe === 'video' ? (
               <div className="w-full aspect-video bg-black rounded-lg shadow-2xl overflow-hidden pointer-events-auto border border-white/10">
                 <iframe 

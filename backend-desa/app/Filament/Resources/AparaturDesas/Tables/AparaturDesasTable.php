@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 
 class AparaturDesasTable
@@ -14,28 +15,37 @@ class AparaturDesasTable
     {
         return $table
             ->columns([
+                ImageColumn::make('foto')
+                    ->label('Foto')
+                    ->circular()
+                    ->defaultImageUrl('https://ui-avatars.com/api/?name=Aparatur&background=012d1d&color=fff'),
+                    
                 TextColumn::make('nama_lengkap')
-                    ->searchable(),
+                    ->label('Nama Lengkap')
+                    ->searchable()
+                    ->weight('bold'),
+                    
                 TextColumn::make('jabatan')
-                    ->searchable(),
+                    ->label('Jabatan')
+                    ->searchable()
+                    ->badge()
+                    ->color('success'),
+                    
                 TextColumn::make('periode_jabatan')
-                    ->searchable(),
-                TextColumn::make('foto')
-                    ->searchable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Periode')
+                    ->searchable()
+                    ->placeholder('-'),
+                    
                 TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y')
+                    ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->label('Ubah Data'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

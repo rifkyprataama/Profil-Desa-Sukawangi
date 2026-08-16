@@ -11,7 +11,8 @@ class AparaturDesaController extends Controller
 {
     public function index()
     {
-        $aparatur = AparaturDesa::all();
+        // PERBAIKAN: Mengurutkan data dari yang terbaru dimasukkan
+        $aparatur = AparaturDesa::latest()->get();
         return response()->json(['success' => true, 'data' => $aparatur], 200);
     }
 
@@ -31,12 +32,24 @@ class AparaturDesaController extends Controller
     public function show($id)
     {
         $aparatur = AparaturDesa::find($id);
+        
+        // PERBAIKAN: Cek jika data tidak ditemukan
+        if (!$aparatur) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        }
+
         return response()->json(['success' => true, 'data' => $aparatur], 200);
     }
 
     public function update(Request $request, $id)
     {
         $aparatur = AparaturDesa::find($id);
+        
+        // PERBAIKAN: Cek jika data tidak ditemukan agar tidak error saat update
+        if (!$aparatur) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        }
+
         $data = $request->all();
 
         if ($request->hasFile('foto')) {
@@ -54,6 +67,11 @@ class AparaturDesaController extends Controller
     public function destroy($id)
     {
         $aparatur = AparaturDesa::find($id);
+        
+        // PERBAIKAN: Cek jika data tidak ditemukan agar tidak error saat dihapus
+        if (!$aparatur) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        }
         
         if ($aparatur->foto) {
             Storage::disk('public')->delete($aparatur->foto);
