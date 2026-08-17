@@ -11,6 +11,10 @@ class Kontak extends Model
         'telepon', 
         'email', 
         'jam_operasional', 
-        'link_peta'
+        'link_peta',
+        // Tambahan kolom sosial media
+        'link_instagram',
+        'link_facebook',
+        'link_youtube'
     ];
 }

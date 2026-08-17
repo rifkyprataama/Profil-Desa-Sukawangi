@@ -15,20 +15,25 @@ class PengaturanBerandasTable
         return $table
             ->columns([
                 TextColumn::make('judul_banner')
-                    ->label('Judul Banner')
-                    ->searchable(),
-                TextColumn::make('apbdes_pendapatan')
-                    ->label('Pendapatan'),
+                    ->label('Judul Banner Utama')
+                    ->searchable()
+                    ->weight('bold'),
+                    
+                TextColumn::make('realisasi_pendapatan')
+                    ->label('Total Pendapatan')
+                    ->badge()
+                    ->color('success'),
+                    
                 TextColumn::make('updated_at')
-                    ->label('Terakhir Diubah')
-                    ->dateTime()
+                    ->label('Terakhir Diperbarui')
+                    ->dateTime('d M Y, H:i')
                     ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->label('Ubah Data'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -10,8 +10,8 @@ import { toast } from 'sonner';
 export default function Pengaduan() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewName, setPreviewName] = useState('');
+  const [dataBanner, setDataBanner] = useState(null);
 
-  // 1. TAMBAHAN STATE: no_wa
   const [formData, setFormData] = useState({
     nama: '',
     nik: '',
@@ -22,9 +22,20 @@ export default function Pengaduan() {
     lampiran: null
   });
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+
+    fetch(`${API_URL}/api/pengaturan-beranda`)
+      .then(res => res.json())
+      .then(res => {
+        if (res.success && res.data) {
+          setDataBanner(Array.isArray(res.data) ? res.data[0] : res.data);
+        }
+      })
+      .catch(err => console.error("Gagal mengambil banner pengaduan:", err));
+  }, [API_URL]);
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -34,12 +45,11 @@ export default function Pengaduan() {
     } else if (type === 'file') {
       const file = files[0];
       if (file) {
-        // 2. LOGIKA VALIDASI FILE: Tolak jika lebih dari 5MB
         if (file.size > 5 * 1024 * 1024) {
           toast.error('Ukuran file terlalu besar!', {
             description: 'Mohon unggah file dengan ukuran maksimal 5MB.'
           });
-          e.target.value = null; // Reset input file
+          e.target.value = null; 
           return;
         }
         setPreviewName(file.name);
@@ -54,37 +64,30 @@ export default function Pengaduan() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // 1. Bungkus data menggunakan FormData karena kita mengirimkan File
     const submitData = new FormData();
 
-    // Jika anonim, kosongkan NIK, jika tidak, pakai data aslinya
     submitData.append('nama', formData.isAnonim ? 'Anonim' : formData.nama);
     submitData.append('nik', formData.isAnonim ? '' : formData.nik);
     submitData.append('no_wa', formData.no_wa);
     submitData.append('kategori', formData.kategori);
     submitData.append('pesan', formData.pesan);
-
-    // React mengirim boolean (true/false), Laravel meminta angka (1/0)
     submitData.append('is_anonim', formData.isAnonim ? 1 : 0);
 
-    // Masukkan file jika ada
     if (formData.lampiran) {
       submitData.append('lampiran', formData.lampiran);
     }
 
-    // 2. Kirim data ke API Laravel (DENGAN TAMBAHAN HEADERS)
-    fetch('http://localhost:8000/api/pengaduan', {
+    fetch(`${API_URL}/api/pengaduan`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json' // INI KUNCI UTAMANYA
+        'Accept': 'application/json'
       },
       body: submitData,
     })
       .then(async (response) => {
-        // Kita tangkap error dari Laravel jika ada data yang tidak sesuai
         const data = await response.json();
         if (!response.ok) {
-          throw data; // Lempar error ke blok catch di bawah
+          throw data; 
         }
         return data;
       })
@@ -96,7 +99,6 @@ export default function Pengaduan() {
             description: 'Tindak lanjut akan diinformasikan melalui nomor WhatsApp yang Anda cantumkan.'
           });
 
-          // Reset form ke kondisi kosong setelah berhasil
           setFormData({
             nama: '',
             nik: '',
@@ -113,9 +115,8 @@ export default function Pengaduan() {
       })
       .catch((error) => {
         setIsSubmitting(false);
-        console.error("Detail Error dari Laravel:", error); // Cek console inspect element jika masih gagal
+        console.error("Detail Error dari Laravel:", error); 
 
-        // Menampilkan pesan error validasi spesifik dari Laravel jika ada
         if (error.errors) {
           toast.error('Data tidak valid!', {
             description: 'Pastikan Nomor WhatsApp dan semua kolom wajib sudah terisi.'
@@ -133,7 +134,11 @@ export default function Pengaduan() {
       <section className="relative h-[350px] md:h-[450px] w-full flex items-center justify-center mt-0">
         <div className="absolute inset-0 z-0 bg-[#012d1d]/80">
           <img
-            src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1920&auto=format&fit=crop"
+            src={
+              dataBanner?.banner_pengaduan 
+                ? `${API_URL}/storage/${dataBanner.banner_pengaduan}` 
+                : "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1920&auto=format&fit=crop"
+            }
             alt="Layanan Pengaduan"
             className="w-full h-full object-cover mix-blend-overlay"
           />
@@ -225,7 +230,6 @@ export default function Pengaduan() {
                   </div>
                 </div>
 
-                {/* 3. TAMBAHAN UI: Kolom Nama, NIK, dan No. WA */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
                     <label className="block text-[14px] font-bold text-[#012d1d] mb-2">Nama Lengkap <span className="text-red-500">*</span></label>

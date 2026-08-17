@@ -42,6 +42,25 @@ class KontakForm
                     ->required()
                     ->rows(4)
                     ->columnSpanFull(),
+
+                // --- TAMBAHAN LINK SOSIAL MEDIA ---
+                TextInput::make('link_instagram')
+                    ->label('Link Instagram')
+                    ->url() // Validasi harus berupa URL
+                    ->placeholder('https://instagram.com/desasukawangi')
+                    ->maxLength(255),
+                    
+                TextInput::make('link_facebook')
+                    ->label('Link Facebook')
+                    ->url()
+                    ->placeholder('https://facebook.com/desasukawangi')
+                    ->maxLength(255),
+                    
+                TextInput::make('link_youtube')
+                    ->label('Link YouTube')
+                    ->url()
+                    ->placeholder('https://youtube.com/@desasukawangi')
+                    ->maxLength(255),
             ]);
     }
 }

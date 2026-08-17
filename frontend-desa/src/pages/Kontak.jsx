@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 export default function Kontak() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dataKontak, setDataKontak] = useState(null);
+  const [dataBanner, setDataBanner] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
@@ -24,40 +25,76 @@ export default function Kontak() {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // MENGAMBIL DATA KONTAK DARI API
-    fetch(`${API_URL}/api/kontak`)
-      .then(response => response.json())
-      .then(res => {
-        if (res.success && res.data) {
-          setDataKontak(res.data);
-        }
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching kontak:', error);
-        setLoading(false);
-      });
+    Promise.all([
+      fetch(`${API_URL}/api/kontak`).then(res => res.json()),
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json())
+    ])
+    .then(([resKontak, resBanner]) => {
+      if (resKontak.success && resKontak.data) {
+        setDataKontak(Array.isArray(resKontak.data) ? resKontak.data[0] : resKontak.data);
+      }
+      
+      if (resBanner.success) {
+        setDataBanner(Array.isArray(resBanner.data) ? resBanner.data[0] : resBanner.data);
+      }
+      
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+      setLoading(false);
+    });
   }, [API_URL]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulasi pengiriman pesan (Bisa dihubungkan ke backend nanti)
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success('Pesan Terkirim!', {
-        description: 'Terima kasih, pesan Anda akan segera dibalas oleh admin Balai Desa.'
+    try {
+      const payload = new FormData();
+      
+      payload.append('nama', formData.nama);
+      payload.append('no_wa', formData.email); 
+      payload.append('kategori', 'Pertanyaan Informasi'); 
+      const gabunganPesan = `[Subjek: ${formData.subjek}]\n\n${formData.pesan}`;
+      payload.append('pesan', gabunganPesan); 
+      payload.append('is_anonim', '0');
+      payload.append('status', 'menunggu');
+
+      const response = await fetch(`${API_URL}/api/pengaduan`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: payload
       });
-      setFormData({ nama: '', email: '', subjek: '', pesan: '' });
-    }, 1500);
+
+      const data = await response.json();
+
+      if (response.ok || data.success || data.status === 'success') {
+        toast.success('Pesan Berhasil Terkirim!', {
+          description: 'Terima kasih, pesan Anda telah masuk ke sistem layanan desa kami.'
+        });
+        setFormData({ nama: '', email: '', subjek: '', pesan: '' });
+      } else {
+        toast.error('Gagal Mengirim Pesan', {
+          description: data.message || 'Mohon periksa kembali isian form Anda.'
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting pesan:', error);
+      toast.error('Terjadi Kesalahan Server', {
+        description: 'Tidak dapat terhubung ke server. Silakan coba lagi nanti.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Data Dummy FAQ
   const faqs = [
     {
       tanya: "Apa saja syarat membuat Surat Pengantar RT/RW?",
@@ -84,7 +121,11 @@ export default function Kontak() {
       <section className="relative h-[300px] md:h-[400px] w-full flex items-center justify-center mt-0">
         <div className="absolute inset-0 z-0 bg-[#012d1d]/80">
           <img 
-            src="https://images.unsplash.com/photo-1596524430615-b46475ddff6e?q=80&w=1920&auto=format&fit=crop" 
+            src={
+              dataBanner?.banner_kontak 
+                ? `${API_URL}/storage/${dataBanner.banner_kontak}` 
+                : "https://images.unsplash.com/photo-1596524430615-b46475ddff6e?q=80&w=1920&auto=format&fit=crop"
+            } 
             alt="Kontak Desa" 
             className="w-full h-full object-cover mix-blend-overlay grayscale-[20%]"
           />

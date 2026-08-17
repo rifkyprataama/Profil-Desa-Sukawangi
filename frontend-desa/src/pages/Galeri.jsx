@@ -10,10 +10,9 @@ export default function Galeri() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('Semua');
   const [selectedItem, setSelectedItem] = useState(null);
+  const [dataBanner, setDataBanner] = useState(null);
   
   const [dataGaleri, setDataGaleri] = useState([]);
-  
-  // TAMBAHAN: State untuk membatasi jumlah item yang tampil (Mulai dari 8)
   const [visibleCount, setVisibleCount] = useState(8);
 
   const categories = ['Semua', 'Infrastruktur', 'Pemerintahan', 'Kegiatan Warga', 'Sosial', 'Kesehatan'];
@@ -23,30 +22,36 @@ export default function Galeri() {
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    fetch(`${API_URL}/api/galeri`)
-      .then(response => response.json())
-      .then(res => {
-        const d = res.data?.data || res.data || res;
-        if (Array.isArray(d)) {
-          const formattedData = d.map(item => ({
-            id: item.id,
-            tipe: item.tipe || 'foto',
-            judul: item.judul_kegiatan,
-            kategori: item.kategori,
-            url: `${API_URL}/storage/${item.file_gambar}`,
-            videoId: item.link_video
-          }));
-          setDataGaleri(formattedData);
-        }
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching galeri:', error);
-        setLoading(false);
-      });
+    Promise.all([
+      fetch(`${API_URL}/api/galeri`).then(res => res.json()),
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json())
+    ])
+    .then(([resGaleri, resBanner]) => {
+      const d = resGaleri.data?.data || resGaleri.data || resGaleri;
+      if (Array.isArray(d)) {
+        const formattedData = d.map(item => ({
+          id: item.id,
+          tipe: item.tipe || 'foto',
+          judul: item.judul_kegiatan,
+          kategori: item.kategori,
+          url: `${API_URL}/storage/${item.file_gambar}`,
+          videoId: item.link_video
+        }));
+        setDataGaleri(formattedData);
+      }
+      
+      if (resBanner.success) {
+        setDataBanner(Array.isArray(resBanner.data) ? resBanner.data[0] : resBanner.data);
+      }
+      
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error('Error fetching galeri:', error);
+      setLoading(false);
+    });
   }, [API_URL]);
 
-  // Reset jumlah yang tampil ke 8 setiap kali kategori diubah
   useEffect(() => {
     setVisibleCount(8);
   }, [activeCategory]);
@@ -55,7 +60,6 @@ export default function Galeri() {
     activeCategory === 'Semua' || item.kategori === activeCategory
   );
 
-  // TAMBAHAN: Hanya memotong array data sesuai dengan `visibleCount`
   const displayedGallery = filteredGallery.slice(0, visibleCount);
 
   useEffect(() => {
@@ -73,7 +77,11 @@ export default function Galeri() {
       <section className="relative h-[300px] md:h-[400px] w-full flex items-center justify-center mt-0">
         <div className="absolute inset-0 z-0 bg-[#012d1d]/80">
           <img 
-            src="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?q=80&w=1920&auto=format&fit=crop" 
+            src={
+              dataBanner?.banner_galeri 
+                ? `${API_URL}/storage/${dataBanner.banner_galeri}` 
+                : "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?q=80&w=1920&auto=format&fit=crop"
+            } 
             alt="Galeri Desa" 
             className="w-full h-full object-cover mix-blend-overlay grayscale-[20%]"
           />
@@ -127,7 +135,6 @@ export default function Galeri() {
             </div>
           ) : displayedGallery.length > 0 ? (
             <>
-              {/* Gunakan displayedGallery di sini */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {displayedGallery.map((item) => (
                   <div 
@@ -166,7 +173,6 @@ export default function Galeri() {
                 ))}
               </div>
 
-              {/* FITUR LOAD MORE AKTIF */}
               {visibleCount < filteredGallery.length && (
                 <div className="mt-12 text-center">
                   <button 

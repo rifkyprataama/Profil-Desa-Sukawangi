@@ -9,21 +9,24 @@ import {
 export default function Pemerintahan() {
   const [loading, setLoading] = useState(true);
 
-  // State untuk menyimpan data asli dari database
   const [dataKades, setDataKades] = useState(null);
   const [dataAparatur, setDataAparatur] = useState([]);
+  const [dataBanner, setDataBanner] = useState(null);
+  
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    // Mengambil data Kades (dari profil) dan Aparatur secara bersamaan
     Promise.all([
-      fetch('http://localhost:8000/api/profil-desa').then(res => res.json()),
-      fetch('http://localhost:8000/api/aparatur').then(res => res.json())
+      fetch(`${API_URL}/api/profil-desa`).then(res => res.json()),
+      fetch(`${API_URL}/api/aparatur`).then(res => res.json()),
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json())
     ])
-    .then(([resProfil, resAparatur]) => {
+    .then(([resProfil, resAparatur, resBanner]) => {
       if (resProfil.status === 'success') setDataKades(resProfil.data);
       if (resAparatur.success) setDataAparatur(resAparatur.data);
+      if (resBanner.success) setDataBanner(Array.isArray(resBanner.data) ? resBanner.data[0] : resBanner.data);
       
       setLoading(false);
     })
@@ -31,9 +34,8 @@ export default function Pemerintahan() {
       console.error("Gagal mengambil data:", error);
       setLoading(false);
     });
-  }, []);
+  }, [API_URL]);
 
-  // FUNGSI FILTER: Mengelompokkan data berdasarkan kata kunci di kolom "jabatan"
   const getSekdes = () => dataAparatur.filter(a => a.jabatan.toLowerCase().includes('sekretaris') || a.jabatan.toLowerCase() === 'sekdes');
   const getKaur = () => dataAparatur.filter(a => a.jabatan.toLowerCase().includes('kaur'));
   const getKasi = () => dataAparatur.filter(a => a.jabatan.toLowerCase().includes('kasi'));
@@ -47,19 +49,16 @@ export default function Pemerintahan() {
     a.jabatan.toLowerCase().includes('rw')
   );
 
-  // Komponen Card Reusable yang sudah disesuaikan dengan field Database
   const PersonCard = ({ data, isUtama = false }) => {
     if (!data) return null;
 
-    // Menyesuaikan penamaan kolom (Kades pakai nama_kepala_desa, Aparatur pakai nama_lengkap)
     const nama = data.nama_lengkap || data.nama_kepala_desa || 'Belum ada data';
     const jabatan = data.jabatan || (data.nama_kepala_desa ? 'Kepala Desa' : 'Belum ada data');
     const foto = data.foto || data.foto_kepala_desa;
     const periode = data.periode_jabatan;
 
-    // Jika tidak ada foto di DB, gunakan UI Avatars
     const imgSrc = foto 
-      ? `http://localhost:8000/storage/${foto}` 
+      ? `${API_URL}/storage/${foto}` 
       : `https://ui-avatars.com/api/?name=${nama.replace(/ /g, '+')}&background=012d1d&color=fff&size=200`;
 
     return (
@@ -90,9 +89,6 @@ export default function Pemerintahan() {
     );
   };
 
-  // =====================================================================
-  // TAMPILAN LOADING
-  // =====================================================================
   if (loading) {
     return (
       <div className="min-h-screen bg-[#fbf9f5] flex flex-col items-center justify-center">
@@ -102,9 +98,6 @@ export default function Pemerintahan() {
     );
   }
 
-  // =====================================================================
-  // TAMPILAN UTAMA
-  // =====================================================================
   return (
     <div className="bg-[#fbf9f5] text-[#1b1c1a] font-['Inter'] flex flex-col min-h-screen">
       
@@ -112,7 +105,11 @@ export default function Pemerintahan() {
       <section className="relative h-[350px] md:h-[450px] w-full flex items-center justify-center mt-0">
         <div className="absolute inset-0 z-0 bg-[#012d1d]/70">
           <img 
-            src="https://images.unsplash.com/photo-1577563908411-50cb989766a3?q=80&w=1920&auto=format&fit=crop" 
+            src={
+              dataBanner?.banner_pemerintahan 
+                ? `${API_URL}/storage/${dataBanner.banner_pemerintahan}` 
+                : "https://images.unsplash.com/photo-1577563908411-50cb989766a3?q=80&w=1920&auto=format&fit=crop"
+            } 
             alt="Pemerintahan Desa" 
             className="w-full h-full object-cover mix-blend-overlay"
           />
@@ -151,7 +148,6 @@ export default function Pemerintahan() {
       <section className="py-16 bg-[#f5f3ef] border-t border-[#c1c8c2]/30">
         <div className="max-w-[1200px] mx-auto px-6">
           
-          {/* Kepala Desa & Sekdes */}
           <div className="flex flex-col items-center mb-16">
             <div className="w-full max-w-[350px] mb-8">
               <PersonCard data={dataKades} isUtama={true} />
@@ -159,7 +155,6 @@ export default function Pemerintahan() {
             
             {getSekdes().length > 0 && (
               <>
-                {/* Garis Penghubung */}
                 <div className="w-1 h-12 bg-[#c1c8c2] mb-8"></div>
                 
                 <div className="w-full max-w-[300px]">
@@ -171,7 +166,6 @@ export default function Pemerintahan() {
             )}
           </div>
 
-          {/* Kepala Urusan (KAUR) */}
           {getKaur().length > 0 && (
             <div className="mb-16">
               <div className="flex items-center gap-3 mb-8 border-b border-[#c1c8c2]/40 pb-4">
@@ -186,7 +180,6 @@ export default function Pemerintahan() {
             </div>
           )}
 
-          {/* Kepala Seksi (KASI) */}
           {getKasi().length > 0 && (
             <div className="mb-16">
               <div className="flex items-center gap-3 mb-8 border-b border-[#c1c8c2]/40 pb-4">
@@ -201,7 +194,6 @@ export default function Pemerintahan() {
             </div>
           )}
 
-          {/* Kepala Dusun (KADUS) */}
           {getKadus().length > 0 && (
             <div className="mb-10">
               <div className="flex items-center gap-3 mb-8 border-b border-[#c1c8c2]/40 pb-4">
@@ -219,7 +211,7 @@ export default function Pemerintahan() {
         </div>
       </section>
 
-      {/* 4. LEMBAGA MITRA DESA (BPD & LKD) */}
+      {/* 4. LEMBAGA MITRA DESA */}
       <section className="py-16 bg-[#fbf9f5] border-t border-[#c1c8c2]/40">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="text-center mb-16">
@@ -229,7 +221,6 @@ export default function Pemerintahan() {
             </p>
           </div>
 
-          {/* BPD */}
           {getBPD().length > 0 && (
             <div className="mb-16">
               <div className="flex items-center justify-center md:justify-start gap-3 mb-8 border-b border-[#c1c8c2]/40 pb-4">
@@ -246,7 +237,6 @@ export default function Pemerintahan() {
             </div>
           )}
 
-          {/* Lembaga Kemasyarakatan Desa (LKD) */}
           {getMitra().length > 0 && (
             <div className="mb-10">
               <div className="flex items-center justify-center md:justify-start gap-3 mb-8 border-b border-[#c1c8c2]/40 pb-4">

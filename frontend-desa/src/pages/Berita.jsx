@@ -7,13 +7,12 @@ import {
 
 export default function Berita() {
   const [beritaList, setBeritaList] = useState([]);
+  const [dataBanner, setDataBanner] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // State untuk Fitur Pencarian & Filter
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('Semua');
   
-  // Daftar Kategori (Nanti bisa dinamis dari database)
   const categories = ['Semua', 'Pemerintahan', 'Pembangunan', 'Sosial', 'Pemberdayaan'];
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -21,25 +20,28 @@ export default function Berita() {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    fetch(`${API_URL}/api/berita`)
-      .then(response => response.json())
-      .then(res => {
-        const dataBerita = res.data?.data || res.data || res;
-        if (Array.isArray(dataBerita)) {
-          setBeritaList(dataBerita);
-        }
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching berita:', error);
-        setLoading(false);
-      });
+    Promise.all([
+      fetch(`${API_URL}/api/berita`).then(res => res.json()),
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json())
+    ])
+    .then(([resBerita, resBanner]) => {
+      const dataBerita = resBerita.data?.data || resBerita.data || resBerita;
+      if (Array.isArray(dataBerita)) {
+        setBeritaList(dataBerita);
+      }
+      if (resBanner.success) {
+        setDataBanner(Array.isArray(resBanner.data) ? resBanner.data[0] : resBanner.data);
+      }
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error('Error fetching berita:', error);
+      setLoading(false);
+    });
   }, [API_URL]);
 
-  // Logika Filter (Pencarian Teks + Kategori)
   const filteredBerita = beritaList.filter((item) => {
     const matchSearch = item.judul.toLowerCase().includes(searchTerm.toLowerCase());
-    // Simulasi filter kategori (jika backend belum ada kolom kategori, kita anggap semua cocok sementara)
     const matchCategory = activeCategory === 'Semua' || item.kategori === activeCategory;
     return matchSearch && matchCategory;
   });
@@ -58,7 +60,11 @@ export default function Berita() {
       <section className="relative h-[300px] md:h-[400px] w-full flex items-center justify-center mt-0">
         <div className="absolute inset-0 z-0 bg-[#012d1d]/80">
           <img 
-            src="https://images.unsplash.com/photo-1585241936939-5ea1bc382c9c?q=80&w=1920&auto=format&fit=crop" 
+            src={
+              dataBanner?.banner_berita 
+                ? `${API_URL}/storage/${dataBanner.banner_berita}` 
+                : "https://images.unsplash.com/photo-1585241936939-5ea1bc382c9c?q=80&w=1920&auto=format&fit=crop"
+            } 
             alt="Kabar Desa" 
             className="w-full h-full object-cover mix-blend-overlay grayscale-[30%]"
           />
@@ -76,8 +82,6 @@ export default function Berita() {
       {/* 2. BREADCRUMB, SEARCH & FILTER */}
       <div className="bg-white/90 backdrop-blur-md border-b border-[#c1c8c2]/50 sticky top-[80px] z-40 shadow-sm">
         <div className="max-w-[1200px] mx-auto px-6 py-4">
-          
-          {/* Baris Atas: Breadcrumb & Search */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-2 text-[14px] font-medium text-[#717973] overflow-x-auto whitespace-nowrap hide-scrollbar w-full md:w-auto">
               <Link to="/" className="hover:text-[#012d1d] flex items-center gap-1"><Home className="w-4 h-4"/> Beranda</Link>
@@ -99,7 +103,6 @@ export default function Berita() {
             </div>
           </div>
 
-          {/* Baris Bawah: Filter Kategori (Pill Menu) */}
           <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1">
             {categories.map((cat) => (
               <button
@@ -181,7 +184,7 @@ export default function Berita() {
                 ))}
               </div>
 
-              {/* 4. PAGINATION (Navigasi Halaman) */}
+              {/* 4. PAGINATION */}
               <div className="flex justify-center items-center gap-2">
                 <button className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] transition-colors disabled:opacity-50">
                   <ChevronLeft className="w-5 h-5" />

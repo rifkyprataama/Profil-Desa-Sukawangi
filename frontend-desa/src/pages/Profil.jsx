@@ -8,7 +8,8 @@ import {
 
 export default function Profil() {
   const [profilDesa, setProfilDesa] = useState(null);
-  const [aparaturDesa, setAparaturDesa] = useState([]); // TAMBAHAN: State untuk aparatur
+  const [aparaturDesa, setAparaturDesa] = useState([]);
+  const [dataBanner, setDataBanner] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -16,17 +17,20 @@ export default function Profil() {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // TAMBAHAN: Mengambil data Profil dan Aparatur secara bersamaan
     Promise.all([
       fetch(`${API_URL}/api/profil-desa`).then(res => res.json()),
-      fetch(`${API_URL}/api/aparatur`).then(res => res.json())
+      fetch(`${API_URL}/api/aparatur`).then(res => res.json()),
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json())
     ])
-    .then(([resProfil, resAparatur]) => {
+    .then(([resProfil, resAparatur, resBanner]) => {
       setProfilDesa(resProfil.data || resProfil);
       
-      // Memasukkan data aparatur jika berhasil diambil
       if (resAparatur.success) {
         setAparaturDesa(resAparatur.data);
+      }
+      
+      if (resBanner.success && resBanner.data) {
+        setDataBanner(Array.isArray(resBanner.data) ? resBanner.data[0] : resBanner.data);
       }
       
       setLoading(false);
@@ -45,7 +49,6 @@ export default function Profil() {
     }
   };
 
-  // Menghitung persentase penduduk secara dinamis (mencegah error jika data kosong)
   const persenLaki = profilDesa?.total_penduduk ? Math.round((profilDesa.penduduk_laki_laki / profilDesa.total_penduduk) * 100) : 52;
   const persenPerempuan = profilDesa?.total_penduduk ? Math.round((profilDesa.penduduk_perempuan / profilDesa.total_penduduk) * 100) : 48;
 
@@ -56,7 +59,11 @@ export default function Profil() {
       <section className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center mt-0">
         <div className="absolute inset-0 z-0 bg-[#012d1d]/60">
           <img 
-            src="https://images.unsplash.com/photo-1593409951662-8e7c10b067d3?q=80&w=1920&auto=format&fit=crop" 
+            src={
+              dataBanner?.banner_profil 
+                ? `${API_URL}/storage/${dataBanner.banner_profil}` 
+                : "https://images.unsplash.com/photo-1593409951662-8e7c10b067d3?q=80&w=1920&auto=format&fit=crop"
+            } 
             alt="Pemandangan Desa" 
             className="w-full h-full object-cover mix-blend-overlay"
           />
@@ -233,7 +240,6 @@ export default function Profil() {
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-                {/* TAMBAHAN: Menggabungkan Kepala Desa dan maksimal 3 Aparatur secara dinamis */}
                 {[
                   { 
                     nama: profilDesa?.nama_kepala_desa || 'Belum Diisi', 

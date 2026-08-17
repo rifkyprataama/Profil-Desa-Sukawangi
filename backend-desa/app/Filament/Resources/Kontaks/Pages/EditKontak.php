@@ -16,4 +16,10 @@ class EditKontak extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    // Tambahkan perintah ini agar redirect ke halaman awal (index)
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

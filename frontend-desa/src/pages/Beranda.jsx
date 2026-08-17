@@ -10,53 +10,50 @@ import {
 export default function Beranda() {
   const [loading, setLoading] = useState(true);
   
-  // State untuk menampung data dari Laravel
   const [dataBeranda, setDataBeranda] = useState(null);
   const [dataProfil, setDataProfil] = useState(null);
-  const [dataBerita, setDataBerita] = useState([]); // State baru untuk Berita
+  const [dataBerita, setDataBerita] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     
-    // Mengambil ke-3 data dari API Laravel secara bersamaan
     Promise.all([
-      fetch('http://localhost:8000/api/pengaturan-beranda').then(res => res.json()),
-      fetch('http://localhost:8000/api/profil-desa').then(res => res.json()),
-      fetch('http://localhost:8000/api/berita').then(res => res.json()) // Mengambil API Berita
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json()).catch(() => null),
+      fetch(`${API_URL}/api/profil-desa`).then(res => res.json()).catch(() => null),
+      fetch(`${API_URL}/api/berita`).then(res => res.json()).catch(() => null)
     ])
     .then(([resBeranda, resProfil, resBerita]) => {
-      // Set Data Beranda
-      if (resBeranda.status === 'success') {
-        setDataBeranda(resBeranda.data);
+      if (resBeranda) {
+        const dBeranda = resBeranda.data || resBeranda;
+        setDataBeranda(Array.isArray(dBeranda) ? dBeranda[0] : dBeranda);
       }
-      
-      // Set Data Profil
-      if (resProfil.status === 'success') {
-        setDataProfil(resProfil.data);
+      if (resProfil) {
+        const dProfil = resProfil.data || resProfil;
+        setDataProfil(Array.isArray(dProfil) ? dProfil[0] : dProfil);
       }
-      
-      // Set Data Berita (Hanya ambil 3 terbaru untuk di Beranda)
-      if (resBerita.success) {
-        setDataBerita(resBerita.data.slice(0, 3)); 
+      if (resBerita) {
+        const dBerita = resBerita.data?.data || resBerita.data || resBerita;
+        if (Array.isArray(dBerita)) {
+          setDataBerita(dBerita.slice(0, 3)); 
+        }
       }
-
       setLoading(false);
     })
     .catch((error) => {
-      console.error("Terjadi kesalahan saat mengambil data:", error);
+      console.error("Terjadi kesalahan saat mengambil data API:", error);
       setLoading(false);
     });
   }, []);
 
-  // Fungsi untuk memformat tanggal bawaan database menjadi format Indonesia (Contoh: 10 Ags 2026)
   const formatTanggal = (tanggal) => {
+    if (!tanggal) return '';
     const options = { day: 'numeric', month: 'short', year: 'numeric' };
     return new Date(tanggal).toLocaleDateString('id-ID', options);
   };
 
-  // =====================================================================
-  // TAMPILAN LOADING
-  // =====================================================================
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#fbf9f5] flex flex-col items-center justify-center">
@@ -66,9 +63,6 @@ export default function Beranda() {
     );
   }
 
-  // =====================================================================
-  // TAMPILAN UTAMA
-  // =====================================================================
   return (
     <div className="bg-[#fbf9f5] text-[#1b1c1a] font-['Inter'] flex flex-col min-h-screen relative overflow-hidden">
       
@@ -76,7 +70,11 @@ export default function Beranda() {
       <section className="relative h-[85vh] min-h-[600px] w-full flex items-center justify-center mt-0">
         <div className="absolute inset-0 z-0 bg-[#012d1d]/80">
           <img 
-            src="https://images.pexels.com/photos/2091157/pexels-photo-2091157.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            src={
+              dataBeranda?.gambar_banner 
+                ? `${API_URL}/storage/${dataBeranda.gambar_banner}` 
+                : "https://images.pexels.com/photos/2091157/pexels-photo-2091157.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            }
             alt="Depan Kantor Desa Sukawangi" 
             className="w-full h-full object-cover mix-blend-overlay grayscale-[10%]"
           />
@@ -226,12 +224,12 @@ export default function Beranda() {
             <div className="max-w-2xl">
               <h2 className="text-[32px] md:text-[40px] font-bold mb-4">Transparansi Keuangan & Program Desa</h2>
               <p className="text-[16px] text-white/80 leading-relaxed">
-                Wujud komitmen pemerintahan desa yang akuntabel. Berikut adalah realisasi pendapatan desa dan fokus pelaksanaan 5 bidang program kerja Tahun Anggaran 2026.
+                Wujud komitmen pemerintahan desa yang akuntabel. Berikut adalah realisasi pendapatan desa dan fokus pelaksanaan 5 bidang program kerja Tahun Anggaran {dataBeranda?.tahun_anggaran || '2026'}.
               </p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-full flex items-center gap-3">
               <Activity className="w-5 h-5 text-[#febe9b]" />
-              <span className="text-[14px] font-bold tracking-wider uppercase">TA 2026</span>
+              <span className="text-[14px] font-bold tracking-wider uppercase">TA {dataBeranda?.tahun_anggaran || '2026'}</span>
             </div>
           </div>
 
@@ -349,7 +347,6 @@ export default function Beranda() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Melakukan looping dari state dataBerita yang diambil dari backend */}
             {dataBerita.length > 0 ? (
               dataBerita.map((berita) => (
                 <Link to={`/berita/${berita.id}`} key={berita.id} className="group bg-white rounded-2xl overflow-hidden border border-[#c1c8c2]/40 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
