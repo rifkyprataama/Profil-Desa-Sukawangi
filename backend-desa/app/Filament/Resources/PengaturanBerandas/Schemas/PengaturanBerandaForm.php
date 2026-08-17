@@ -5,7 +5,6 @@ namespace App\Filament\Resources\PengaturanBerandas\Schemas;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Section;
 use Filament\Schemas\Schema;
 
 class PengaturanBerandaForm
@@ -56,39 +55,48 @@ class PengaturanBerandaForm
                     ->numeric()
                     ->required(),
 
-                // -- KOTAK KHUSUS SEMUA BANNER --
-                Section::make('Pengaturan Gambar Banner Website')
-                    ->description('Ubah gambar latar belakang (banner) untuk masing-masing halaman di website. Kosongkan jika ingin menggunakan gambar bawaan sistem.')
-                    ->collapsed() // Bikin bisa di-minimize agar rapi
-                    ->schema([
-                        FileUpload::make('gambar_banner')
-                            ->label('Banner Halaman Beranda')
-                            ->directory('banners')->image(),
-                            
-                        FileUpload::make('banner_profil')
-                            ->label('Banner Halaman Profil')
-                            ->directory('banners')->image(),
-                            
-                        FileUpload::make('banner_pemerintahan')
-                            ->label('Banner Halaman Pemerintahan')
-                            ->directory('banners')->image(),
-                            
-                        FileUpload::make('banner_pengaduan')
-                            ->label('Banner Halaman Pengaduan')
-                            ->directory('banners')->image(),
-                            
-                        FileUpload::make('banner_berita')
-                            ->label('Banner Halaman Berita')
-                            ->directory('banners')->image(),
-                            
-                        FileUpload::make('banner_galeri')
-                            ->label('Banner Halaman Galeri')
-                            ->directory('banners')->image(),
-                            
-                        FileUpload::make('banner_kontak')
-                            ->label('Banner Halaman Kontak')
-                            ->directory('banners')->image(),
-                    ])->columns(2),
+                // -- UPLOAD SEMUA BANNER (DIJAMIN AMAN) --
+                FileUpload::make('gambar_banner')
+                    ->label('Banner Halaman Beranda')
+                    ->directory('banners')
+                    ->image()
+                    ->columnSpanFull(),
+                    
+                FileUpload::make('banner_profil')
+                    ->label('Banner Halaman Profil')
+                    ->directory('banners')
+                    ->image()
+                    ->columnSpanFull(),
+                    
+                FileUpload::make('banner_pemerintahan')
+                    ->label('Banner Halaman Pemerintahan')
+                    ->directory('banners')
+                    ->image()
+                    ->columnSpanFull(),
+                    
+                FileUpload::make('banner_pengaduan')
+                    ->label('Banner Halaman Pengaduan')
+                    ->directory('banners')
+                    ->image()
+                    ->columnSpanFull(),
+                    
+                FileUpload::make('banner_berita')
+                    ->label('Banner Halaman Berita')
+                    ->directory('banners')
+                    ->image()
+                    ->columnSpanFull(),
+                    
+                FileUpload::make('banner_galeri')
+                    ->label('Banner Halaman Galeri')
+                    ->directory('banners')
+                    ->image()
+                    ->columnSpanFull(),
+                    
+                FileUpload::make('banner_kontak')
+                    ->label('Banner Halaman Kontak')
+                    ->directory('banners')
+                    ->image()
+                    ->columnSpanFull(),
             ]);
     }
 }

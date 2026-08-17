@@ -23,25 +23,29 @@ export default function Galeri() {
     window.scrollTo(0, 0);
     
     Promise.all([
-      fetch(`${API_URL}/api/galeri`).then(res => res.json()),
-      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json())
+      fetch(`${API_URL}/api/galeri`).then(res => res.json()).catch(() => null),
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json()).catch(() => null)
     ])
     .then(([resGaleri, resBanner]) => {
-      const d = resGaleri.data?.data || resGaleri.data || resGaleri;
-      if (Array.isArray(d)) {
-        const formattedData = d.map(item => ({
-          id: item.id,
-          tipe: item.tipe || 'foto',
-          judul: item.judul_kegiatan,
-          kategori: item.kategori,
-          url: `${API_URL}/storage/${item.file_gambar}`,
-          videoId: item.link_video
-        }));
-        setDataGaleri(formattedData);
+      if (resGaleri) {
+        const d = resGaleri.data?.data || resGaleri.data || resGaleri;
+        if (Array.isArray(d)) {
+          const formattedData = d.map(item => ({
+            id: item.id,
+            tipe: item.tipe || 'foto',
+            judul: item.judul_kegiatan,
+            kategori: item.kategori,
+            url: `${API_URL}/storage/${item.file_gambar}`,
+            videoId: item.link_video
+          }));
+          setDataGaleri(formattedData);
+        }
       }
       
-      if (resBanner.success) {
-        setDataBanner(Array.isArray(resBanner.data) ? resBanner.data[0] : resBanner.data);
+      // PERBAIKAN DI SINI
+      if (resBanner) {
+        const dBanner = resBanner.data || resBanner;
+        setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);
       }
       
       setLoading(false);

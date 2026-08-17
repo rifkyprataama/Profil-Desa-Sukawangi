@@ -19,14 +19,19 @@ export default function Pemerintahan() {
     window.scrollTo(0, 0);
     
     Promise.all([
-      fetch(`${API_URL}/api/profil-desa`).then(res => res.json()),
-      fetch(`${API_URL}/api/aparatur`).then(res => res.json()),
-      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json())
+      fetch(`${API_URL}/api/profil-desa`).then(res => res.json()).catch(() => null),
+      fetch(`${API_URL}/api/aparatur`).then(res => res.json()).catch(() => null),
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json()).catch(() => null)
     ])
     .then(([resProfil, resAparatur, resBanner]) => {
-      if (resProfil.status === 'success') setDataKades(resProfil.data);
-      if (resAparatur.success) setDataAparatur(resAparatur.data);
-      if (resBanner.success) setDataBanner(Array.isArray(resBanner.data) ? resBanner.data[0] : resBanner.data);
+      if (resProfil) setDataKades(resProfil.data || resProfil);
+      if (resAparatur) setDataAparatur(resAparatur.data || resAparatur);
+      
+      // PERBAIKAN DI SINI
+      if (resBanner) {
+        const dBanner = resBanner.data || resBanner;
+        setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);
+      }
       
       setLoading(false);
     })

@@ -18,19 +18,22 @@ export default function Profil() {
     window.scrollTo(0, 0);
 
     Promise.all([
-      fetch(`${API_URL}/api/profil-desa`).then(res => res.json()),
-      fetch(`${API_URL}/api/aparatur`).then(res => res.json()),
-      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json())
+      fetch(`${API_URL}/api/profil-desa`).then(res => res.json()).catch(() => null),
+      fetch(`${API_URL}/api/aparatur`).then(res => res.json()).catch(() => null),
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json()).catch(() => null)
     ])
     .then(([resProfil, resAparatur, resBanner]) => {
-      setProfilDesa(resProfil.data || resProfil);
-      
-      if (resAparatur.success) {
-        setAparaturDesa(resAparatur.data);
+      if (resProfil) {
+        setProfilDesa(resProfil.data || resProfil);
+      }
+      if (resAparatur) {
+        setAparaturDesa(resAparatur.data || resAparatur);
       }
       
-      if (resBanner.success && resBanner.data) {
-        setDataBanner(Array.isArray(resBanner.data) ? resBanner.data[0] : resBanner.data);
+      // PERBAIKAN DI SINI
+      if (resBanner) {
+        const dBanner = resBanner.data || resBanner;
+        setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);
       }
       
       setLoading(false);

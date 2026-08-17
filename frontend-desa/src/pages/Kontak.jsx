@@ -26,16 +26,19 @@ export default function Kontak() {
     window.scrollTo(0, 0);
 
     Promise.all([
-      fetch(`${API_URL}/api/kontak`).then(res => res.json()),
-      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json())
+      fetch(`${API_URL}/api/kontak`).then(res => res.json()).catch(() => null),
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json()).catch(() => null)
     ])
     .then(([resKontak, resBanner]) => {
-      if (resKontak.success && resKontak.data) {
-        setDataKontak(Array.isArray(resKontak.data) ? resKontak.data[0] : resKontak.data);
+      if (resKontak) {
+        const dKontak = resKontak.data || resKontak;
+        setDataKontak(Array.isArray(dKontak) ? dKontak[0] : dKontak);
       }
       
-      if (resBanner.success) {
-        setDataBanner(Array.isArray(resBanner.data) ? resBanner.data[0] : resBanner.data);
+      // PERBAIKAN DI SINI
+      if (resBanner) {
+        const dBanner = resBanner.data || resBanner;
+        setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);
       }
       
       setLoading(false);

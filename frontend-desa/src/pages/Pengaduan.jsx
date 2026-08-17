@@ -29,9 +29,11 @@ export default function Pengaduan() {
 
     fetch(`${API_URL}/api/pengaturan-beranda`)
       .then(res => res.json())
-      .then(res => {
-        if (res.success && res.data) {
-          setDataBanner(Array.isArray(res.data) ? res.data[0] : res.data);
+      .then(resBanner => {
+        // PERBAIKAN DI SINI
+        if (resBanner) {
+          const dBanner = resBanner.data || resBanner;
+          setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);
         }
       })
       .catch(err => console.error("Gagal mengambil banner pengaduan:", err));

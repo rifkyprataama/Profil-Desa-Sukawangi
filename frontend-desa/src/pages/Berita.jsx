@@ -21,17 +21,23 @@ export default function Berita() {
     window.scrollTo(0, 0);
 
     Promise.all([
-      fetch(`${API_URL}/api/berita`).then(res => res.json()),
-      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json())
+      fetch(`${API_URL}/api/berita`).then(res => res.json()).catch(() => null),
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json()).catch(() => null)
     ])
     .then(([resBerita, resBanner]) => {
-      const dataBerita = resBerita.data?.data || resBerita.data || resBerita;
-      if (Array.isArray(dataBerita)) {
-        setBeritaList(dataBerita);
+      if (resBerita) {
+        const dataBerita = resBerita.data?.data || resBerita.data || resBerita;
+        if (Array.isArray(dataBerita)) {
+          setBeritaList(dataBerita);
+        }
       }
-      if (resBanner.success) {
-        setDataBanner(Array.isArray(resBanner.data) ? resBanner.data[0] : resBanner.data);
+      
+      // PERBAIKAN DI SINI
+      if (resBanner) {
+        const dBanner = resBanner.data || resBanner;
+        setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);
       }
+      
       setLoading(false);
     })
     .catch(error => {

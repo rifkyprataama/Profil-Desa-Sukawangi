@@ -18,7 +18,17 @@ return new class extends Migration
             $table->string('judul_banner')->nullable();
             $table->text('subjudul_banner')->nullable();
             
+            // Kolom Gambar Banner (Semua Halaman)
+            $table->string('gambar_banner')->nullable();
+            $table->string('banner_profil')->nullable();
+            $table->string('banner_pemerintahan')->nullable();
+            $table->string('banner_pengaduan')->nullable();
+            $table->string('banner_berita')->nullable();
+            $table->string('banner_galeri')->nullable();
+            $table->string('banner_kontak')->nullable();
+            
             // Angka APBDes
+            $table->string('tahun_anggaran')->nullable();
             $table->string('realisasi_pendapatan')->nullable();
             $table->integer('persentase_dd')->nullable();
             $table->integer('persentase_add')->nullable();
