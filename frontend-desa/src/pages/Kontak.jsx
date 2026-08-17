@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { 
   MapPin, Phone, Mail, Clock, Send, 
   Home, ChevronRight, MessageSquare, Map, 
-  HelpCircle, CheckCircle 
+  HelpCircle, CheckCircle, FileQuestion 
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -11,6 +11,9 @@ export default function Kontak() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dataKontak, setDataKontak] = useState(null);
   const [dataBanner, setDataBanner] = useState(null);
+  
+  // STATE BARU UNTUK FAQ
+  const [faqList, setFaqList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
@@ -25,20 +28,25 @@ export default function Kontak() {
   useEffect(() => {
     window.scrollTo(0, 0);
 
+    // MENGAMBIL 3 API SEKALIGUS (Kontak, Banner, dan FAQ)
     Promise.all([
       fetch(`${API_URL}/api/kontak`).then(res => res.json()).catch(() => null),
-      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json()).catch(() => null)
+      fetch(`${API_URL}/api/pengaturan-beranda`).then(res => res.json()).catch(() => null),
+      fetch(`${API_URL}/api/faq`).then(res => res.json()).catch(() => null)
     ])
-    .then(([resKontak, resBanner]) => {
+    .then(([resKontak, resBanner, resFaq]) => {
       if (resKontak) {
         const dKontak = resKontak.data || resKontak;
         setDataKontak(Array.isArray(dKontak) ? dKontak[0] : dKontak);
       }
-      
-      // PERBAIKAN DI SINI
       if (resBanner) {
         const dBanner = resBanner.data || resBanner;
         setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);
+      }
+      
+      // MENYIMPAN DATA FAQ DARI DATABASE
+      if (resFaq && resFaq.success) {
+        setFaqList(resFaq.data);
       }
       
       setLoading(false);
@@ -59,7 +67,6 @@ export default function Kontak() {
     
     try {
       const payload = new FormData();
-      
       payload.append('nama', formData.nama);
       payload.append('no_wa', formData.email); 
       payload.append('kategori', 'Pertanyaan Informasi'); 
@@ -97,25 +104,6 @@ export default function Kontak() {
       setIsSubmitting(false);
     }
   };
-
-  const faqs = [
-    {
-      tanya: "Apa saja syarat membuat Surat Pengantar RT/RW?",
-      jawab: "Anda cukup membawa Fotokopi KTP, Fotokopi KK, dan mengisi formulir permohonan yang tersedia di Balai Desa."
-    },
-    {
-      tanya: "Berapa lama proses pembuatan surat keterangan?",
-      jawab: "Jika syarat lengkap dan Kepala Desa berada di tempat, surat keterangan dapat selesai dalam waktu 1x24 jam (hari kerja)."
-    },
-    {
-      tanya: "Apakah Balai Desa buka di hari Sabtu atau Minggu?",
-      jawab: "Tidak. Sesuai jam operasional pemerintahan, Balai Desa hanya beroperasi dari hari Senin hingga Jumat (08.00 - 15.00 WIB)."
-    },
-    {
-      tanya: "Bagaimana cara melaporkan jalan rusak?",
-      jawab: "Anda dapat menggunakan menu 'Layanan Pengaduan' di website ini, sertakan foto kondisi jalan dan lokasi spesifiknya."
-    }
-  ];
 
   return (
     <div className="bg-[#fbf9f5] text-[#1b1c1a] font-['Inter'] flex flex-col min-h-screen">
@@ -273,7 +261,7 @@ export default function Kontak() {
         </div>
       </section>
 
-      {/* 5. FAQ (Tanya Jawab Umum) */}
+      {/* 5. FAQ (Tanya Jawab Umum) DINAMIS DARI DATABASE */}
       <section className="py-16 bg-white border-t border-[#c1c8c2]/30 flex-grow">
         <div className="max-w-[900px] mx-auto px-6">
           <div className="flex flex-col items-center text-center mb-10">
@@ -284,19 +272,30 @@ export default function Kontak() {
             <p className="text-[#414844] text-[16px]">Jawaban cepat untuk pertanyaan yang sering diajukan warga.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {faqs.map((faq, index) => (
-              <div key={index} className="bg-[#fbf9f5] border border-[#e4e2de] rounded-2xl p-6 hover:border-[#c1c8c2] transition-colors">
-                <h3 className="text-[16px] font-bold text-[#012d1d] mb-3 flex items-start gap-2">
-                  <span className="text-[#835336] mt-0.5">Q:</span> {faq.tanya}
-                </h3>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-[#003f63] mt-0.5 shrink-0" />
-                  <p className="text-[14px] text-[#414844] leading-relaxed">{faq.jawab}</p>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
+               {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-[#e4e2de] rounded-2xl"></div>)}
+            </div>
+          ) : faqList.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {faqList.map((faq) => (
+                <div key={faq.id} className="bg-[#fbf9f5] border border-[#e4e2de] rounded-2xl p-6 hover:border-[#c1c8c2] transition-colors shadow-sm hover:shadow-md">
+                  <h3 className="text-[16px] font-bold text-[#012d1d] mb-3 flex items-start gap-2">
+                    <span className="text-[#835336] mt-0.5">Q:</span> {faq.pertanyaan}
+                  </h3>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-[#003f63] mt-0.5 shrink-0" />
+                    <p className="text-[14px] text-[#414844] leading-relaxed">{faq.jawaban}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-[#fbf9f5] rounded-2xl border border-[#c1c8c2]/40 flex flex-col items-center">
+              <FileQuestion className="w-12 h-12 text-[#c1c8c2] mb-3" />
+              <p className="text-[#717973] font-bold">Belum ada daftar FAQ (Tanya Jawab).</p>
+            </div>
+          )}
         </div>
       </section>
 

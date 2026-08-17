@@ -11,8 +11,8 @@ use App\Http\Controllers\Api\AparaturDesaController;
 use App\Http\Controllers\Api\PengaduanController;
 use App\Http\Controllers\Api\GaleriController;
 use App\Http\Controllers\PengaturanBerandaController; 
-use App\Http\Controllers\Api\KontakController; // <-- TAMBAHKAN IMPORT INI
-
+use App\Http\Controllers\Api\KontakController;
+use App\Models\Faq; // <-- IMPORT MODEL FAQ
 
 // =================================================================
 // 1. WILAYAH PUBLIK (Bisa diakses siapa saja tanpa login)
@@ -25,9 +25,15 @@ Route::apiResource('galeri', GaleriController::class)->only(['index', 'show']);
 
 Route::get('/profil-desa', [ProfilDesaController::class, 'index']);
 Route::get('/pengaturan-beranda', [PengaturanBerandaController::class, 'index']);
-
-// <-- TAMBAHKAN RUTE KONTAK DI SINI -->
 Route::get('/kontak', [KontakController::class, 'index']);
+
+// <-- API ROUTE UNTUK FAQ -->
+Route::get('/faq', function () {
+    return response()->json([
+        'success' => true,
+        'data' => Faq::latest()->get()
+    ]);
+});
 
 Route::apiResource('pengaduan', PengaduanController::class)->only(['index', 'show', 'store']);
 

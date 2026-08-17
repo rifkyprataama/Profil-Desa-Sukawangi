@@ -13,6 +13,10 @@ export default function Berita() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('Semua');
   
+  // --- STATE BARU UNTUK PAGINATION ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // Jumlah berita yang ingin ditampilkan per halaman
+  
   const categories = ['Semua', 'Pemerintahan', 'Pembangunan', 'Sosial', 'Pemberdayaan'];
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -32,7 +36,6 @@ export default function Berita() {
         }
       }
       
-      // PERBAIKAN DI SINI
       if (resBanner) {
         const dBanner = resBanner.data || resBanner;
         setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);
@@ -46,11 +49,23 @@ export default function Berita() {
     });
   }, [API_URL]);
 
+  // --- LOGIKA FILTER BERITA ---
   const filteredBerita = beritaList.filter((item) => {
     const matchSearch = item.judul.toLowerCase().includes(searchTerm.toLowerCase());
     const matchCategory = activeCategory === 'Semua' || item.kategori === activeCategory;
     return matchSearch && matchCategory;
   });
+
+  // --- LOGIKA RESET HALAMAN JIKA FILTER BERUBAH ---
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeCategory]);
+
+  // --- LOGIKA PEMOTONGAN DATA UNTUK PAGINATION ---
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredBerita.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredBerita.length / itemsPerPage);
 
   const createExcerpt = (htmlString, maxLength = 120) => {
     if (!htmlString) return '';
@@ -144,10 +159,11 @@ export default function Berita() {
                 </div>
               ))}
             </div>
-          ) : filteredBerita.length > 0 ? (
+          ) : currentItems.length > 0 ? (
             <>
+              {/* KITA GUNAKAN currentItems, BUKAN filteredBerita */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-                {filteredBerita.map((item, index) => (
+                {currentItems.map((item, index) => (
                   <Link to={`/berita/${item.slug || item.id}`} key={index} className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-[#c1c8c2]/40 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
                     <div className="h-56 w-full overflow-hidden relative shrink-0 bg-[#e4e2de]">
                       <img 
@@ -190,25 +206,40 @@ export default function Berita() {
                 ))}
               </div>
 
-              {/* 4. PAGINATION */}
-              <div className="flex justify-center items-center gap-2">
-                <button className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] transition-colors disabled:opacity-50">
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button className="w-10 h-10 rounded-lg flex items-center justify-center border bg-[#012d1d] text-white font-bold shadow-md">
-                  1
-                </button>
-                <button className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] font-bold transition-colors">
-                  2
-                </button>
-                <button className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] font-bold transition-colors">
-                  3
-                </button>
-                <span className="text-[#717973] font-bold mx-1">...</span>
-                <button className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] transition-colors">
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
+              {/* 4. PAGINATION DINAMIS */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2">
+                  <button 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {[...Array(totalPages)].map((_, i) => (
+                    <button 
+                      key={i}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center border font-bold transition-colors ${
+                        currentPage === i + 1 
+                          ? 'bg-[#012d1d] text-white border-[#012d1d] shadow-md' 
+                          : 'border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea]'
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+
+                  <button 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#c1c8c2] bg-white text-[#414844] hover:bg-[#efeeea] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
             </>
           ) : (
             <div className="text-center py-24 bg-white rounded-2xl border border-[#c1c8c2]/40 shadow-sm flex flex-col items-center justify-center">
@@ -216,7 +247,7 @@ export default function Berita() {
                <h3 className="text-[24px] font-bold text-[#012d1d] mb-2">Pencarian Tidak Ditemukan</h3>
                <p className="text-[#414844] text-[16px]">Maaf, tidak ada berita dengan filter/judul tersebut.</p>
                <button 
-                 onClick={() => {setSearchTerm(''); setActiveCategory('Semua');}} 
+                 onClick={() => {setSearchTerm(''); setActiveCategory('Semua'); setCurrentPage(1);}} 
                  className="mt-6 bg-[#efeeea] text-[#012d1d] px-6 py-2 rounded-lg font-bold hover:bg-[#e4e2de] transition-colors"
                >
                  Tampilkan Semua Berita
