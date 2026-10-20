@@ -19,10 +19,7 @@ function App() {
           <Route path="pemerintahan" element={<Pemerintahan />} />
           <Route path="pengaduan" element={<Pengaduan />} />
           <Route path="berita" element={<Berita />} />
-          
-          {/* 2. Tambahkan rute dinamis untuk detail berita di sini */}
           <Route path="berita/:slug" element={<BeritaDetail />} /> 
-          
           <Route path="galeri" element={<Galeri />} />
           <Route path="kontak" element={<Kontak />} />
         </Route>
