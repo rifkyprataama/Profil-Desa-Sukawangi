@@ -126,7 +126,7 @@ export default function Kontak() {
             <Phone className="w-4 h-4" /> Hubungi Kami
           </div>
           <h1 className="text-[36px] md:text-[52px] font-extrabold text-white leading-tight drop-shadow-md">
-            Kontak Pelayanan Desa
+            Kontak Pelayanan Desa Sukawangi
           </h1>
         </div>
       </section>

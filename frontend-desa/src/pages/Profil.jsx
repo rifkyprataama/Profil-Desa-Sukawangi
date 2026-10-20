@@ -29,8 +29,6 @@ export default function Profil() {
       if (resAparatur) {
         setAparaturDesa(resAparatur.data || resAparatur);
       }
-      
-      // PERBAIKAN DI SINI
       if (resBanner) {
         const dBanner = resBanner.data || resBanner;
         setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);

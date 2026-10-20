@@ -26,8 +26,6 @@ export default function Pemerintahan() {
     .then(([resProfil, resAparatur, resBanner]) => {
       if (resProfil) setDataKades(resProfil.data || resProfil);
       if (resAparatur) setDataAparatur(resAparatur.data || resAparatur);
-      
-      // PERBAIKAN DI SINI
       if (resBanner) {
         const dBanner = resBanner.data || resBanner;
         setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);

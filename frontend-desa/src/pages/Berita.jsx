@@ -15,7 +15,7 @@ export default function Berita() {
   
   // --- STATE BARU UNTUK PAGINATION ---
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // Jumlah berita yang ingin ditampilkan per halaman
+  const itemsPerPage = 6;
   
   const categories = ['Semua', 'Pemerintahan', 'Pembangunan', 'Sosial', 'Pemberdayaan'];
 
@@ -92,7 +92,7 @@ export default function Berita() {
         </div>
         <div className="relative z-10 text-center px-6 mt-10">
           <div className="inline-flex items-center gap-2 bg-[#febe9b] text-[#331200] px-4 py-1.5 rounded-full text-[13px] font-bold uppercase tracking-widest mb-6 shadow-sm">
-            <Newspaper className="w-4 h-4" /> Pusat Informasi
+            <Newspaper className="w-4 h-4" /> Pusat Informasi Desa Sukawangi
           </div>
           <h1 className="text-[36px] md:text-[52px] font-extrabold text-white leading-tight drop-shadow-md">
             Kabar Desa Terkini

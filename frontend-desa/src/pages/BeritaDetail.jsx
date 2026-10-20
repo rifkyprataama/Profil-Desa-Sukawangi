@@ -13,8 +13,6 @@ export default function BeritaDetail() {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
   useEffect(() => {
-    // TRIK PINTAR: Ambil semua data berita, lalu filter di frontend
-    // Ini memastikan halaman tidak akan error meskipun backend belum punya endpoint detail
     fetch(`${API_URL}/api/berita`)
       .then(response => response.json())
       .then(res => {
@@ -30,7 +28,7 @@ export default function BeritaDetail() {
           if (foundBerita && foundBerita.judul) {
             setBerita(foundBerita);
           } else {
-            setBerita(null); // Jika tidak valid, lempar ke halaman "Tidak Ditemukan"
+            setBerita(null);
           }
         } else {
           setBerita(null);
@@ -42,7 +40,6 @@ export default function BeritaDetail() {
         setLoading(false);
       });
       
-    // Scroll otomatis ke atas saat halaman dibuka
     window.scrollTo(0, 0);
   }, [slug, API_URL]);
 

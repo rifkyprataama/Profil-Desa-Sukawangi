@@ -338,7 +338,7 @@ export default function Beranda() {
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <h2 className="text-[32px] font-bold text-[#012d1d] mb-2">Kabar Terbaru</h2>
+              <h2 className="text-[32px] font-bold text-[#012d1d] mb-2">Kabar Terbaru Desa Sukawangi</h2>
               <p className="text-[#414844] text-[16px]">Informasi dan berita terkini seputar Desa Sukawangi.</p>
             </div>
             <Link to="/berita" className="hidden md:flex items-center gap-2 text-[#012d1d] font-bold hover:text-[#835336] transition-colors group">
@@ -380,7 +380,7 @@ export default function Beranda() {
               ))
             ) : (
               <div className="col-span-full text-center text-[#717973] py-10">
-                Belum ada berita yang diterbitkan.
+                Belum ada berita desa yang diterbitkan.
               </div>
             )}
           </div>
