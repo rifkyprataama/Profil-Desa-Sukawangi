@@ -11,8 +11,6 @@ export default function Kontak() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dataKontak, setDataKontak] = useState(null);
   const [dataBanner, setDataBanner] = useState(null);
-  
-  // STATE BARU UNTUK FAQ
   const [faqList, setFaqList] = useState([]);
   const [loading, setLoading] = useState(true);
 

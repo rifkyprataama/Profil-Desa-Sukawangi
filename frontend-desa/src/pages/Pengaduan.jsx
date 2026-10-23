@@ -30,7 +30,6 @@ export default function Pengaduan() {
     fetch(`${API_URL}/api/pengaturan-beranda`)
       .then(res => res.json())
       .then(resBanner => {
-        // PERBAIKAN DI SINI
         if (resBanner) {
           const dBanner = resBanner.data || resBanner;
           setDataBanner(Array.isArray(dBanner) ? dBanner[0] : dBanner);

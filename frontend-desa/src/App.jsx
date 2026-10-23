@@ -5,7 +5,7 @@ import Profil from './pages/Profil';
 import Pemerintahan from './pages/Pemerintahan';
 import Pengaduan from './pages/Pengaduan';
 import Berita from './pages/Berita';
-import BeritaDetail from './pages/BeritaDetail'; // <-- 1. Import file yang baru dibuat
+import BeritaDetail from './pages/BeritaDetail';
 import Galeri from './pages/Galeri';
 import Kontak from './pages/Kontak';
 

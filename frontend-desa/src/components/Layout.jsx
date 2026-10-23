@@ -153,7 +153,6 @@ export default function Layout() {
           <div className="flex flex-col gap-3">
             <h3 className="text-[16px] font-bold text-[#febe9b] mb-3 uppercase tracking-wider">Sosial Media</h3>
             
-            {/* LINK SOSIAL MEDIA DINAMIS (Muncul hanya jika diisi oleh Admin) */}
             {dataKontak?.link_instagram && (
               <a href={dataKontak.link_instagram} target="_blank" rel="noreferrer" className="text-white/80 hover:text-white hover:translate-x-1 transition-all text-[15px] flex items-center gap-2">
                 <ChevronRight className="w-4 h-4"/> Instagram Resmi

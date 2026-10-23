@@ -9,11 +9,8 @@ export default function Berita() {
   const [beritaList, setBeritaList] = useState([]);
   const [dataBanner, setDataBanner] = useState(null);
   const [loading, setLoading] = useState(true);
-  
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('Semua');
-  
-  // --- STATE BARU UNTUK PAGINATION ---
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   

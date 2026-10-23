@@ -19,12 +19,10 @@ export default function BeritaDetail() {
         const dataBerita = res.data?.data || res.data || res;
         
         if (Array.isArray(dataBerita)) {
-          // Cari berita yang id atau slug-nya sama dengan parameter di URL
           const foundBerita = dataBerita.find(
             (item) => String(item.slug) === String(slug) || String(item.id) === String(slug)
           );
           
-          // Pastikan berita yang ditemukan valid dan memiliki judul
           if (foundBerita && foundBerita.judul) {
             setBerita(foundBerita);
           } else {
